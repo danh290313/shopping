@@ -25,6 +25,7 @@ Route::post('products', [ProductController::class, 'store']);
 Route::put('products/{id}', [ProductController::class, 'update'])->whereNumber('id');
 Route::get('products/{id}', [ProductController::class, 'show'])->whereNumber('id');
 Route::delete('products/{id}', [ProductController::class, 'destroy'])->whereNumber('id');
+Route::put('products/restore_all', [ProductController::class, 'restoreAll']);
 // Route::apiResource('products', ProductController::class)->only([
 //     'show'
 // ])->where(['id'=>'numeric']);

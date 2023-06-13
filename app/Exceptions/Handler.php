@@ -3,8 +3,13 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use \Illuminate\Http\Response;
+use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Throwable;
+use Exception;
 class Handler extends ExceptionHandler
 {
     /**
@@ -49,44 +54,62 @@ class Handler extends ExceptionHandler
     }
     public function render($request, Throwable $e)
     {
+       try{
         $statusCode = Response::HTTP_BAD_REQUEST;
         if ($e->getCode() >= Response::HTTP_INTERNAL_SERVER_ERROR) {
             $statusCode = $e->getCode();
         }
         
-        $message = __('messages.errors.bad_request');
+        $title = __('server_error');
+        $message = null;
         $errors = null;
-        switch (true) {
+        switch ($e) {
             case $e instanceof AuthenticationException:
-                $message = __('messages.errors.unauthorized');
+                $title = __('unauthorized');
                 $statusCode = Response::HTTP_UNAUTHORIZED;
+                $message = $e->getMessage();
                 break;
-               
             case $e instanceof NotFoundHttpException:
-                $message = __('messages.errors.page_not_found');
+                $title = __('not_found_http_exception');
+                $message = 'No route found for "'.$request->method().' '.$request->fullUrl().'.';
                 $statusCode = Response::HTTP_NOT_FOUND;
                 break;
 
             case $e instanceof ModelNotFoundException:
-                $message = __('messages.errors.model_not_found');
+                $title = __('model_not_found');
+                $message = $e->getMessage() ?? 'Model not found.';
                 $statusCode = Response::HTTP_NOT_FOUND;
                 break;
-            
-            case $e instanceof ApiException:
-                $message    = $e->getMessage();
-                $statusCode = $e->getCode();
-                $errors = $e->getData();
+            case $e instanceof ValidationException:
+                $title = __('validation_failed');
+                $message = $e->getMessage();
+                $errors = $e->errors();
+                $statusCode =Response::HTTP_UNPROCESSABLE_ENTITY;
                 break;
-
+            case $e instanceof MethodNotAllowedHttpException:
+                $title    = "method_not_allowed";
+                $message  = 'The ' .$request->method().' method is not supported for route '.$request->fullUrl() .'.';
+                // $statusCode = $e->getCode();
+                // $errors = $e->getData();
+                break;
+            // case $e instanceof ApiException:
+            //     $title    = $e->getMessage();
+            //     $statusCode = $e->getCode();
+            //     $errors = $e->getData();
+            //     break;
             default:
+                $message = $e->getMessage();
                 break;
         }
 
         if ($request->is('*api*')) {
-            return $this->makeErrorResponse($statusCode, $message, $errors);
+            return $this->makeErrorResponse($statusCode, $title, $errors,$message);
         }
         
-        return response($message, Response::HTTP_BAD_REQUEST);
+        return response($title, Response::HTTP_BAD_REQUEST);
+       }catch(Exception $ex){
+            return response()->json(['error'=>$ex->getMessage()]);
+       }
     }
      /**
      * @param int $code
@@ -95,18 +118,17 @@ class Handler extends ExceptionHandler
      * @param mixed|null $data
      * @return Response
      */
-    protected function makeErrorResponse(int $code, string $message, ?array $errors = null, $data = null)
+    protected function makeErrorResponse(int $code, string $title, ?array $errors = null, $message = null)
     {
         $response = [
-            'status' => false,
-            'message' => $message,
-            'error' => $errors
+            'result' => 'error',
+            'title' => $title,
+            'error' => $errors,
+            'message'=> $message
         ];
-
-        if (!empty($data)) {
-            $response['data'] = $data;
-        }
-
+        // if (!empty($message)) {
+        //     $response['message'] = $message;
+        // }
         return response()->json($response, $code);
     }
 }

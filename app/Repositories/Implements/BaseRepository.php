@@ -89,4 +89,7 @@ class BaseRepository implements IBaseRepository{
     public function whereOrderBy($column_name, $value, $order_by){
         return $this->model->where($column_name, $value)->orderBy('created_at', $order_by)->get();
     }
+    public function restoreAll(){
+        return $this->model->withTrashed()->restore();
+    }
 }
