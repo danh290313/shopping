@@ -47,66 +47,66 @@ class Handler extends ExceptionHandler
             //
         });
     }
-    // public function render($request, Throwable $e)
-    // {
-    //     $statusCode = Response::HTTP_BAD_REQUEST;
-    //     if ($e->getCode() >= Response::HTTP_INTERNAL_SERVER_ERROR) {
-    //         $statusCode = $e->getCode();
-    //     }
+    public function render($request, Throwable $e)
+    {
+        $statusCode = Response::HTTP_BAD_REQUEST;
+        if ($e->getCode() >= Response::HTTP_INTERNAL_SERVER_ERROR) {
+            $statusCode = $e->getCode();
+        }
         
-    //     $message = __('messages.errors.bad_request');
-    //     $errors = null;
-    //     switch (true) {
-    //         case $e instanceof AuthenticationException:
-    //             $message = __('messages.errors.unauthorized');
-    //             $statusCode = Response::HTTP_UNAUTHORIZED;
-    //             break;
+        $message = __('messages.errors.bad_request');
+        $errors = null;
+        switch (true) {
+            case $e instanceof AuthenticationException:
+                $message = __('messages.errors.unauthorized');
+                $statusCode = Response::HTTP_UNAUTHORIZED;
+                break;
                
-    //         case $e instanceof NotFoundHttpException:
-    //             $message = __('messages.errors.page_not_found');
-    //             $statusCode = Response::HTTP_NOT_FOUND;
-    //             break;
+            case $e instanceof NotFoundHttpException:
+                $message = __('messages.errors.page_not_found');
+                $statusCode = Response::HTTP_NOT_FOUND;
+                break;
 
-    //         case $e instanceof ModelNotFoundException:
-    //             $message = __('messages.errors.model_not_found');
-    //             $statusCode = Response::HTTP_NOT_FOUND;
-    //             break;
+            case $e instanceof ModelNotFoundException:
+                $message = __('messages.errors.model_not_found');
+                $statusCode = Response::HTTP_NOT_FOUND;
+                break;
             
-    //         case $e instanceof ApiException:
-    //             $message    = $e->getMessage();
-    //             $statusCode = $e->getCode();
-    //             $errors = $e->getData();
-    //             break;
+            case $e instanceof ApiException:
+                $message    = $e->getMessage();
+                $statusCode = $e->getCode();
+                $errors = $e->getData();
+                break;
 
-    //         default:
-    //             break;
-    //     }
+            default:
+                break;
+        }
 
-    //     if ($request->is('*api*')) {
-    //         return $this->makeErrorResponse($statusCode, $message, $errors);
-    //     }
+        if ($request->is('*api*')) {
+            return $this->makeErrorResponse($statusCode, $message, $errors);
+        }
         
-    //     return response($message, Response::HTTP_BAD_REQUEST);
-    // }
-    //  /**
-    //  * @param int $code
-    //  * @param string $message
-    //  * @param array|null $errors
-    //  * @param mixed|null $data
-    //  * @return Response
-    //  */
-    // protected function makeErrorResponse(int $code, string $message, ?array $errors = null, $data = null)
-    // {
-    //     $response = [
-    //         'status' => false,
-    //         'message' => $message,
-    //         'error' => $errors
-    //     ];
+        return response($message, Response::HTTP_BAD_REQUEST);
+    }
+     /**
+     * @param int $code
+     * @param string $message
+     * @param array|null $errors
+     * @param mixed|null $data
+     * @return Response
+     */
+    protected function makeErrorResponse(int $code, string $message, ?array $errors = null, $data = null)
+    {
+        $response = [
+            'status' => false,
+            'message' => $message,
+            'error' => $errors
+        ];
 
-    //     if (!empty($data)) {
-    //         $response['data'] = $data;
-    //     }
+        if (!empty($data)) {
+            $response['data'] = $data;
+        }
 
-    //     return response()->json($response, $code);
-    // }
+        return response()->json($response, $code);
+    }
 }

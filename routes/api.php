@@ -22,9 +22,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('products', [ProductController::class, 'index']);
 Route::post('products', [ProductController::class, 'store']);
-Route::apiResource('products/{id}', ProductController::class)->except([
-    'index','store'
-])->whereNumber('id');
+Route::put('products/{id}', [ProductController::class, 'update'])->whereNumber('id');
+Route::get('products/{id}', [ProductController::class, 'show'])->whereNumber('id');
+Route::delete('products/{id}', [ProductController::class, 'destroy'])->whereNumber('id');
+// Route::apiResource('products', ProductController::class)->only([
+//     'show'
+// ])->where(['id'=>'numeric']);
 
 Route::get('sizes', [SizeController::class, 'index']);
 Route::post('sizes', [SizeController::class, 'store']);

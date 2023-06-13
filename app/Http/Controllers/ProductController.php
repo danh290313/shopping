@@ -9,6 +9,7 @@ use App\Http\Responses\SuccessEntityResponse;
 use App\Http\Responses\ErrorResponse;
 use App\Repositories\Interfaces\IProductRepository;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 class ProductController extends Controller
 {
     protected $product_repo;
@@ -48,7 +49,7 @@ class ProductController extends Controller
             'slug'=>'required|max:255|unique:products'
         ]);
         
-        $rs = Product::create(['name'=>$request['name'], 'branch'=>$request['branch'], 
+        $rs = Product::create(['name'=>$request['name'], 'brand'=>$request['brand'], 
         'description'=>$request['description'], 'slug'=>$request['slug']]);
         return  SuccessEntityResponse::createResponse($rs,220);
     }
@@ -61,7 +62,8 @@ class ProductController extends Controller
      */
     public function show(Request $request,$id)
     {
-        $product = $this->product_repo->findOrFail($id);
+        $product = $this->product_repo->getById($id);
+        if(!$product) throw new ModelNotFoundException('ko ooo');
         // if(!$product) return ErrorResponse::createResponse('not found');
         return SuccessEntityResponse::createResponse($product);
     }
