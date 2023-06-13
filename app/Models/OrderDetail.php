@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * Created by Reliese Model.
+ */
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * Class OrderDetail
+ * 
+ * @property int $id
+ * @property int|null $order_id
+ * @property int|null $product_detail_id
+ * @property float|null $regular_price
+ * @property int|null $quantity
+ * @property int|null $review_id
+ * 
+ * @property Order|null $order
+ * @property ProductDetail|null $product_detail
+ * @property Review|null $review
+ *
+ * @package App\Models
+ */
+class OrderDetail extends Model
+{
+	protected $table = 'order_detail';
+	public $incrementing = false;
+	public $timestamps = false;
+
+	protected $casts = [
+		'id' => 'int',
+		'order_id' => 'int',
+		'product_detail_id' => 'int',
+		'regular_price' => 'float',
+		'quantity' => 'int',
+		'review_id' => 'int'
+	];
+
+	protected $fillable = [
+		'order_id',
+		'product_detail_id',
+		'regular_price',
+		'quantity',
+		'review_id'
+	];
+
+	public function order()
+	{
+		return $this->belongsTo(Order::class);
+	}
+
+	public function product_detail()
+	{
+		return $this->belongsTo(ProductDetail::class);
+	}
+
+	public function review()
+	{
+		return $this->belongsTo(Review::class);
+	}
+}
