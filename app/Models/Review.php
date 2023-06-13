@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Class Review
  * 
- * @property int $Id
+ * @property int $id
  * @property string $titile
  * @property string $content
  * @property Carbon $created_at
@@ -27,17 +27,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Review extends Model
 {
-	protected $table = 'review';
-	protected $primaryKey = 'Id';
-	public $timestamps = false;
 
 	protected $casts = [
-		'user_id' => 'int',
-		'rating' => 'int'
+		// 'user_id' => 'int',
+		// 'rating' => 'int'
 	];
 
 	protected $fillable = [
-		'titile',
+		'title',
 		'content',
 		'user_id',
 		'rating'
@@ -48,8 +45,8 @@ class Review extends Model
 		return $this->belongsTo(User::class);
 	}
 
-	public function order_details()
+	public function order_detail()
 	{
-		return $this->hasMany(OrderDetail::class);
+		return $this->belongsTo(OrderDetail::class);
 	}
 }

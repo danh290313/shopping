@@ -20,11 +20,11 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Collection extends Model
 {
-	protected $table = 'collection';
 	public $timestamps = false;
 
 	protected $fillable = [
-		'name'
+		'name',
+		'picture_id'
 	];
 
 	public function tags()

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Class Tag
  * 
- * @property int $Id
+ * @property int $id
  * @property string $name
  * @property int $collection_id
  * 
@@ -23,12 +23,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Tag extends Model
 {
-	protected $table = 'tag';
-	protected $primaryKey = 'Id';
 	public $timestamps = false;
 
 	protected $casts = [
-		'collection_id' => 'int'
+		// 'collection_id' => 'int'
 	];
 
 	protected $fillable = [

@@ -24,27 +24,25 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Sale extends Model
 {
-	protected $table = 'sale';
-	public $incrementing = false;
 	public $timestamps = false;
 
 	protected $casts = [
-		'id' => 'int',
-		'from' => 'datetime',
-		'to' => 'datetime',
-		'product_detail_id' => 'int',
-		'sale_price' => 'float'
+		// 'id' => 'int',
+		// 'from' => 'datetime',
+		// 'to' => 'datetime',
+		// 'product_detail_id' => 'int',
+		// 'sale_price' => 'float'
 	];
 
 	protected $fillable = [
-		'from',
-		'to',
+		'from_time',
+		'to_time',
 		'product_detail_id',
 		'sale_price'
 	];
 
 	public function product_detail()
 	{
-		return $this->belongsTo(ProductDetail::class);
+		return $this->belongsToMany(ProductDetail::class);
 	}
 }

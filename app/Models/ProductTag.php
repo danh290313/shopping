@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Class ProductTag
  * 
- * @property int $Id
+ * @property int $id
  * @property int $product_id
  * @property int $tag_id
  * 
@@ -22,13 +22,11 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ProductTag extends Model
 {
-	protected $table = 'product_tag';
-	protected $primaryKey = 'Id';
 	public $timestamps = false;
 
 	protected $casts = [
-		'product_id' => 'int',
-		'tag_id' => 'int'
+		// 'product_id' => 'int',
+		// 'tag_id' => 'int'
 	];
 
 	protected $fillable = [

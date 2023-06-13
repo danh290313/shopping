@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Class User
  * 
- * @property int $Id
+ * @property int $id
  * @property string $name
  * @property string $email
  * @property string|null $provider
@@ -29,7 +29,6 @@ class User extends Model
 {
 	use HasFactory;
 	protected $table = 'user';
-	protected $primaryKey = 'Id';
 	public $timestamps = false;
 
 	protected $casts = [

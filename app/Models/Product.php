@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Class Product
  * 
- * @property int $Id
+ * @property int $id
  * @property string $name
  * @property string $brand
  * @property string $description
@@ -30,30 +30,16 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Product extends Model
 {
-	protected $table = 'product';
-	protected $primaryKey = 'Id';
-	public $timestamps = false;
 
 	protected $casts = [
-		'update_at' => 'datetime'
 	];
 
 	protected $fillable = [
 		'name',
 		'brand',
 		'description',
-		'update_at'
+		'slug'
 	];
-
-	public function colors()
-	{
-		return $this->hasMany(Color::class);
-	}
-
-	public function pictures()
-	{
-		return $this->hasMany(Picture::class);
-	}
 
 	public function product_details()
 	{
@@ -63,7 +49,7 @@ class Product extends Model
 	public function tags()
 	{
 		return $this->belongsToMany(Tag::class)
-					->withPivot('Id');
+					->withPivot('id');
 	}
 
 	public function sizes()

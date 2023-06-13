@@ -29,17 +29,15 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ProductDetail extends Model
 {
-	protected $table = 'product_detail';
-	public $incrementing = false;
 	public $timestamps = false;
 
 	protected $casts = [
-		'id' => 'int',
-		'product_id' => 'int',
-		'color_id' => 'int',
-		'picture_id' => 'int',
-		'regular_price' => 'float',
-		'quantity' => 'int'
+		// 'id' => 'int',
+		// 'product_id' => 'int',
+		// 'color_id' => 'int',
+		// 'picture_id' => 'int',
+		// 'regular_price' => 'float',
+		// 'quantity' => 'int'
 	];
 
 	protected $fillable = [

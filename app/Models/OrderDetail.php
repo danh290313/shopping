@@ -26,12 +26,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class OrderDetail extends Model
 {
-	protected $table = 'order_detail';
-	public $incrementing = false;
-	public $timestamps = false;
 
 	protected $casts = [
-		'id' => 'int',
 		'order_id' => 'int',
 		'product_detail_id' => 'int',
 		'regular_price' => 'float',
@@ -44,7 +40,8 @@ class OrderDetail extends Model
 		'product_detail_id',
 		'regular_price',
 		'quantity',
-		'review_id'
+		'review_id',
+		'sale_price'
 	];
 
 	public function order()

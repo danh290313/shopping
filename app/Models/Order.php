@@ -26,22 +26,20 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Order extends Model
 {
-	protected $table = 'order';
-	public $incrementing = false;
-	public $timestamps = false;
 
 	protected $casts = [
 		'id' => 'int',
 		'paid' => 'bool',
-		'status' => 'int',
-		'user_id' => 'int'
+		'status' => 'string',
+		'user_id' => 'int',
+		'shipped_at' => 'timestamp'
 	];
 
 	protected $fillable = [
 		'paid',
-		'note',
 		'status',
-		'user_id'
+		'user_id',
+		'shipped_at'
 	];
 
 	public function order_details()

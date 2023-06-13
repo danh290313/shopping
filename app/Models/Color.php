@@ -24,24 +24,15 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Color extends Model
 {
-	protected $table = 'color';
 	public $timestamps = false;
 
 	protected $casts = [
-		'product_id' => 'int'
 	];
 
 	protected $fillable = [
 		'name',
-		'product_id',
 		'hex_value'
 	];
-
-	public function product()
-	{
-		return $this->belongsTo(Product::class);
-	}
-
 	public function product_details()
 	{
 		return $this->hasMany(ProductDetail::class);

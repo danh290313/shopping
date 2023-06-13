@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Class Picture
  * 
- * @property int $Id
+ * @property int $id
  * @property string $source
  * @property int|null $product_id
  * @property int|null $color_id
@@ -25,30 +25,24 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Picture extends Model
 {
-	protected $table = 'picture';
-	protected $primaryKey = 'Id';
 	public $timestamps = false;
 
 	protected $casts = [
-		'product_id' => 'int',
 		'color_id' => 'int',
 		'collection_id' => 'int'
 	];
 
 	protected $fillable = [
 		'source',
-		'product_id',
-		'color_id',
-		'collection_id'
 	];
 
-	public function product()
-	{
-		return $this->belongsTo(Product::class);
-	}
 
-	public function product_details()
+	public function product_detail()
 	{
-		return $this->hasMany(ProductDetail::class);
+		return $this->belongsTo(ProductDetail::class);
+	}
+	public function colection()
+	{
+		return $this->belongsTo(App\Models\Collection::class);
 	}
 }
