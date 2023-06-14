@@ -8,6 +8,7 @@ use App\Http\Responses\SuccessCollectionResponse;
 use App\Http\Responses\SuccessEntityResponse;
 use App\Http\Responses\ErrorResponse;
 use App\Repositories\Interfaces\IProductRepository;
+use App\Repositories\Interfaces\ITagRepository;
 use App\Repositories\Interfaces\ISuccessCollectionResponse;
 use App\Repositories\Interfaces\ISuccessEntityResponse;
 use Illuminate\Http\JsonResponse;
@@ -15,12 +16,14 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class ProductController extends Controller
 {
     protected $productRepo;
+    protected $tagRepo;
     protected $successCollectionResponse;
     protected $successEntityResponse;
     
-    public function __construct(IProductRepository $productRepo,ISuccessCollectionResponse $successCollectionResponse,
+    public function __construct(IProductRepository $productRepo,ITagRepository $tagRepo,ISuccessCollectionResponse $successCollectionResponse,
     ISuccessEntityResponse $successEntityResponse){
         $this->productRepo = $productRepo;
+        $this->tagRepo = $tagRepo;
         $this->successCollectionResponse = $successCollectionResponse;
         $this->successEntityResponse = $successEntityResponse;
     }
@@ -32,9 +35,12 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $rs = $this->productRepo->paginate($request['limit'] ?? 10)->toArray();
+        $validated = $request->validate([
+            'includes' => 'array',
+            'includes.*'=>'in:tag'
+        ]);
+        $rs = $this->productRepo->getAllProduct($request->all());
         return $this->successCollectionResponse->createResponse($rs,200);
-       ;
     }
 
     /**
@@ -49,11 +55,12 @@ class ProductController extends Controller
             'name' => 'required|max:200',
             'brand' => 'required|max:50',
             'description'=>'required',
-            'slug'=>'required|max:255|unique:products'
+            'slug'=>'required|max:255|unique:products',
+            'tags'=>'array|min:1',
+            'tags.*.id'=>'int|exists:tag,id'      
         ]);
-        $rs = $this->productRepo->create(['name'=>$request['name'], 'brand'=>$request['brand'], 
-        'description'=>$request['description'], 'slug'=>$request['slug']]);
-        return  $this->successEntityResponse->createResponse($rs,200);
+        $rs = $this->productRepo->createProduct($request->all());
+        return  $this->successEntityResponse->createResponse($products,200);
     }
 
     /**
@@ -82,12 +89,13 @@ class ProductController extends Controller
             'name' => 'string|max:200',
             'brand' => 'string|max:50',
             'description'=>'string',
-            'slug'=>'string|max:255|unique:products,slug,'.$id
+            'slug'=>'string|max:255|unique:products,slug,'.$id,
+            'tags'=>'array|min:1',
+            'tags.*.id'=>'int|exists:tags,id',      
+            'product_details'=>'array|required',
+            'product_details'
         ]);
-        $product = $this->productRepo->getById($id);
-        if(!$product) throw new ModelNotFoundException('Product not found for id='.$id.'.');
-        $credentials = $request->only(['name','brand','description','slug']);
-        $product->update($credentials);
+        $product = $this->productRepo->updateProduct($request->all(),$id);
         return $this->successEntityResponse->createResponse($product);
       
     }
@@ -108,4 +116,5 @@ class ProductController extends Controller
         $product = $this->productRepo->restoreAll();
         return response()->json(["result"=> "ok"]);
     }
+  
 }

@@ -28,11 +28,11 @@ class Order extends Model
 {
 
 	protected $casts = [
-		'id' => 'int',
-		'paid' => 'bool',
-		'status' => 'string',
-		'user_id' => 'int',
-		'shipped_at' => 'timestamp'
+		// 'id' => 'int',
+		// 'paid' => 'bool',
+		// 'status' => 'string',
+		// 'user_id' => 'int',
+		// 'shipped_at' => 'timestamp'
 	];
 
 	protected $fillable = [

@@ -17,7 +17,10 @@ class BaseRepository implements IBaseRepository{
     {
         return $this->model->paginate($itemOnPage);
     }
-
+    public function with($populateValue)
+    {
+        return $this->model->with($populateValue);
+    }
     public function getAll()
     {
         return $this->model->all();

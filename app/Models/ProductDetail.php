@@ -55,12 +55,12 @@ class ProductDetail extends Model
 
 	public function picture()
 	{
-		return $this->belongsTo(Picture::class);
+		return $this->hasOne(Picture::class);
 	}
 
 	public function color()
 	{
-		return $this->belongsTo(Color::class);
+		return $this->belongsToMany(Color::class);
 	}
 
 	public function order_details()
