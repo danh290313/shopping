@@ -32,9 +32,10 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $rs = $this->productRepo->paginate($request['limit'] ?? 10)->toArray();
-        return $this->successCollectionResponse->createResponse($rs,200);
-       ;
+        $rs = $this->productRepo->paginate($request['limit'] ?? 1)->toArray();
+        $response = $this->successCollectionResponse->createResponse($rs, 200);
+        return $response;
+       
     }
 
     /**
