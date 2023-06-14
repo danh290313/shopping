@@ -56,10 +56,9 @@ class Handler extends ExceptionHandler
     {
        try{
         $statusCode = Response::HTTP_BAD_REQUEST;
-        if ($e->getCode() >= Response::HTTP_INTERNAL_SERVER_ERROR) {
+        if ($e->getCode() <= Response::HTTP_INTERNAL_SERVER_ERROR && $e->getCode() > 100) {
             $statusCode = $e->getCode();
         }
-        
         $title = __('server_error');
         $message = null;
         $errors = null;
@@ -101,14 +100,13 @@ class Handler extends ExceptionHandler
                 $message = $e->getMessage();
                 break;
         }
-
         if ($request->is('*api*')) {
             return $this->makeErrorResponse($statusCode, $title, $errors,$message);
         }
         
         return response($title, Response::HTTP_BAD_REQUEST);
        }catch(Exception $ex){
-            return response()->json(['error'=>$ex->getMessage()]);
+            return $this->makeErrorResponse(500,'server_error', null,$ex->getMessage());
        }
     }
      /**

@@ -8,14 +8,21 @@ use App\Http\Responses\SuccessCollectionResponse;
 use App\Http\Responses\SuccessEntityResponse;
 use App\Http\Responses\ErrorResponse;
 use App\Repositories\Interfaces\IProductRepository;
+use App\Repositories\Interfaces\ISuccessCollectionResponse;
+use App\Repositories\Interfaces\ISuccessEntityResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 class ProductController extends Controller
 {
     protected $productRepo;
+    protected $successCollectionResponse;
+    protected $successEntityResponse;
     
-    public function __construct(IProductRepository $productRepo){
-        return $this->productRepo = $productRepo;
+    public function __construct(IProductRepository $productRepo,ISuccessCollectionResponse $successCollectionResponse,
+    ISuccessEntityResponse $successEntityResponse){
+        $this->productRepo = $productRepo;
+        $this->successCollectionResponse = $successCollectionResponse;
+        $this->successEntityResponse = $successEntityResponse;
     }
 
     /**
@@ -26,7 +33,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $rs = $this->productRepo->paginate($request['limit'] ?? 10)->toArray();
-        return SuccessCollectionResponse::createResponse($rs,200);
+        return $this->successCollectionResponse->createResponse($rs,200);
        ;
     }
 
@@ -44,9 +51,9 @@ class ProductController extends Controller
             'description'=>'required',
             'slug'=>'required|max:255|unique:products'
         ]);
-        $rs = Product::create(['name'=>$request['name'], 'brand'=>$request['brand'], 
+        $rs = $this->productRepo->create(['name'=>$request['name'], 'brand'=>$request['brand'], 
         'description'=>$request['description'], 'slug'=>$request['slug']]);
-        return  SuccessEntityResponse::createResponse($rs,200);
+        return  $this->successEntityResponse->createResponse($rs,200);
     }
 
     /**
@@ -59,7 +66,7 @@ class ProductController extends Controller
     {
         $product = $this->productRepo->getById($id);
         if(!$product) throw new ModelNotFoundException('Product not found for id='.$id.'.');
-        return SuccessEntityResponse::createResponse($product);
+        return $this->successEntityResponse->createResponse($product);
     }
 
     /**
@@ -71,11 +78,17 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $validated = $request->validate([
+            'name' => 'string|max:200',
+            'brand' => 'string|max:50',
+            'description'=>'string',
+            'slug'=>'string|max:255|unique:products,slug,'.$id
+        ]);
         $product = $this->productRepo->getById($id);
         if(!$product) throw new ModelNotFoundException('Product not found for id='.$id.'.');
         $credentials = $request->only(['name','brand','description','slug']);
         $product->update($credentials);
-        return SuccessEntityResponse::createResponse($product);
+        return $this->successEntityResponse->createResponse($product);
       
     }
     /**
