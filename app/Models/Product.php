@@ -33,14 +33,13 @@ class Product extends Model
 	use SoftDeletes;
 	protected $casts = [
 	];
-
+	protected $hidden = ['pivot'];
 	protected $fillable = [
 		'name',
 		'brand',
 		'description',
 		'slug'
 	];
-
 	public function product_details()
 	{
 		return $this->hasMany(ProductDetail::class);
@@ -48,8 +47,8 @@ class Product extends Model
 
 	public function tags()
 	{
-		return $this->belongsToMany(Tag::class)
-					->withPivot('id');
+		return $this->belongsToMany(Tag::class,'product_tags','product_id','tag_id');
+					// ->withPivot('id');
 	}
 
 	public function sizes()

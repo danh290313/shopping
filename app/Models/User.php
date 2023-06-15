@@ -6,6 +6,7 @@
 
 namespace App\Models;
 
+use App\Models\Order;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -53,4 +54,7 @@ class User extends Model
 	{
 		return $this->hasMany(Review::class);
 	}
+	public function orders(){
+        return $this->hasMany(Order::class);
+    }
 }
