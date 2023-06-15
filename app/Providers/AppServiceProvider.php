@@ -26,6 +26,7 @@ use App\Models\Tag;
 use App\Models\Order;
 use App\Models\Color;
 use App\Models\User;
+use App\Models\Picture;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -36,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(IProductRepository::class, function () {
-            return new ProductRepository(new Product(),new ProductDetail());
+            return new ProductRepository(new Product(),new ProductDetail(),new Picture());
         });
         $this->app->singleton(ITagRepository::class, function () {
             return new TagRepository(new Tag());

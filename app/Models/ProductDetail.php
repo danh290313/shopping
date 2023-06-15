@@ -20,7 +20,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property int|null $quantity
  * 
  * @property Product|null $product
- * @property Picture|null $picture
  * @property Color|null $color
  * @property Collection|OrderDetail[] $order_details
  * @property Collection|Sale[] $sales
@@ -29,8 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ProductDetail extends Model
 {
-	public $timestamps = false;
-
+	protected $hidden = ['pivot','color_id','product_id','created_at','updated_at'];
 	protected $casts = [
 		// 'id' => 'int',
 		// 'product_id' => 'int',
@@ -38,6 +36,8 @@ class ProductDetail extends Model
 		// 'picture_id' => 'int',
 		// 'regular_price' => 'float',
 		// 'quantity' => 'int'
+		'created_at' => 'datetime:Y-m-d H:m:s',
+		'updated_at' => 'datetime:Y-m-d H:m:s',
 	];
 
 	protected $fillable = [
@@ -53,14 +53,9 @@ class ProductDetail extends Model
 		return $this->belongsTo(Product::class);
 	}
 
-	public function picture()
-	{
-		return $this->hasOne(Picture::class);
-	}
-
 	public function color()
 	{
-		return $this->belongsToMany(Color::class);
+		return $this->belongsToMany(Color::class,'product_details','id','color_id');
 	}
 
 	public function order_details()
@@ -71,5 +66,8 @@ class ProductDetail extends Model
 	public function sales()
 	{
 		return $this->hasMany(Sale::class);
+	}
+	public function picture(){
+		return $this->belongsTo(Picture::class,'picture_id');
 	}
 }

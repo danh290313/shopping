@@ -13,6 +13,7 @@ use App\Repositories\Interfaces\ISuccessCollectionResponse;
 use App\Repositories\Interfaces\ISuccessEntityResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Exceptions\CustomException\UnprocessaleContents;
 class ProductController extends Controller
 {
     protected $productRepo;
@@ -37,7 +38,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'includes' => 'array',
-            'includes.*'=>'in:tag'
+            'includes.*'=>'in:tag,detail,all,picture'
         ]);
         $rs = $this->productRepo->getAllProduct($request->all());
         return $this->successCollectionResponse->createResponse($rs,200);
@@ -57,10 +58,18 @@ class ProductController extends Controller
             'description'=>'required',
             'slug'=>'required|max:255|unique:products',
             'tags'=>'array|min:1',
-            'tags.*.id'=>'int|exists:tag,id'      
+            'tags.*.id'=>'int|exists:tag,id',
+            'pictures' => 'required|min:1|array',      
+            'pictures.*' => 'image',     
+            'colors'=> 'required|array',
+            'colors.*.id' => 'int|required|exists:colors,id|distinct',            
+            'colors.*.picture' => 'int|required|distinct',
+            'colors.*.regular_price' => 'decimal:2|required',
+            'colors.*.quantity' => 'int|required',
+            'colors.*.active' => 'boolean|required',
         ]);
         $rs = $this->productRepo->createProduct($request->all());
-        return  $this->successEntityResponse->createResponse($products,200);
+        return  $this->successEntityResponse->createResponse($rs,200);
     }
 
     /**
@@ -90,10 +99,16 @@ class ProductController extends Controller
             'brand' => 'string|max:50',
             'description'=>'string',
             'slug'=>'string|max:255|unique:products,slug,'.$id,
-            'tags'=>'array|min:1',
-            'tags.*.id'=>'int|exists:tags,id',      
-            'product_details'=>'array|required',
-            'product_details'
+            'tags'=>'array',
+            'tags.*.id'=>'int|exists:tags,id', 
+            'pictures' => 'array',      
+            'pictures.*' => 'int|exists:pictures,id', //picture_id , user call api add picture and pass id here when add new pictures
+            'colors'=> 'array',
+            'colors.*.id' => 'int|required|exists:colors,id|distinct',            
+            'colors.*.picture_id' => 'int|min:0|distinct',
+            'colors.*.regular_price' => 'decimal:2',
+            'colors.*.quantity' => 'int',
+            'colors.*.active' => 'boolean',
         ]);
         $product = $this->productRepo->updateProduct($request->all(),$id);
         return $this->successEntityResponse->createResponse($product);

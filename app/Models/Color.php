@@ -25,8 +25,10 @@ use Illuminate\Database\Eloquent\Model;
 class Color extends Model
 {
 	protected $casts = [
+		'created_at' => 'datetime:Y-m-d h:m:s',
+		'updated_at' => 'datetime:Y-m-d h:m:s',
 	];
-
+	protected $hidden = ['pivot','created_at','updated_at'];
 	protected $fillable = [
 		'name',
 		'hex_value'
