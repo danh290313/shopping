@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use App\Exceptions\CustomException\BaseException;
 use Throwable;
 use Exception;
 class Handler extends ExceptionHandler
@@ -88,8 +89,11 @@ class Handler extends ExceptionHandler
     //         case $e instanceof MethodNotAllowedHttpException:
     //             $title    = "method_not_allowed";
     //             $message  = 'The ' .$request->method().' method is not supported for route '.$request->fullUrl() .'.';
-    //             // $statusCode = $e->getCode();
-    //             // $errors = $e->getData();
+    //             break;
+    //         case $e instanceof BaseException:
+    //             $title    = $e->getTitle();
+    //             $message  =  $e->getMessage();
+    //             $statusCode = $e->getStatusCode();
     //             break;
     //         // case $e instanceof ApiException:
     //         //     $title    = $e->getMessage();
@@ -106,27 +110,28 @@ class Handler extends ExceptionHandler
         
     //     return response($title, Response::HTTP_BAD_REQUEST);
     //    }catch(Exception $ex){
+    //         echo $ex->getMessage();
     //         return $this->makeErrorResponse(500,'server_error', null,$ex->getMessage());
     //    }
     // }
-    //  /**
-    //  * @param int $code
-    //  * @param string $message
-    //  * @param array|null $errors
-    //  * @param mixed|null $data
-    //  * @return Response
-    //  */
-    // protected function makeErrorResponse(int $code, string $title, ?array $errors = null, $message = null)
-    // {
-    //     $response = [
-    //         'result' => 'error',
-    //         'title' => $title,
-    //         'error' => $errors,
-    //         'message'=> $message
-    //     ];
-    //     // if (!empty($message)) {
-    //     //     $response['message'] = $message;
-    //     // }
-    //     return response()->json($response, $code);
-    // }
+     /**
+     * @param int $code
+     * @param string $message
+     * @param array|null $errors
+     * @param mixed|null $data
+     * @return Response
+     */
+    protected function makeErrorResponse(int $code, string $title, ?array $errors = null, $message = null)
+    {
+        $response = [
+            'result' => 'error',
+            'title' => $title,
+            'error' => $errors,
+            'message'=> $message
+        ];
+        // if (!empty($message)) {
+        //     $response['message'] = $message;
+        // }
+        return response()->json($response, $code);
+    }
 }

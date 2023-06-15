@@ -32,7 +32,9 @@ class Order extends Model
 		// 'paid' => 'bool',
 		// 'status' => 'string',
 		// 'user_id' => 'int',
-		// 'shipped_at' => 'timestamp'
+		'shipped_at' => 'datetime:Y-m-d H:m:s',
+		'created_at' => 'datetime:Y-m-d H:m:s',
+		'updated_at' => 'datetime:Y-m-d H:m:s',
 	];
 
 	protected $fillable = [

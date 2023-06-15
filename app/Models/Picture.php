@@ -26,14 +26,15 @@ use Illuminate\Database\Eloquent\Model;
 class Picture extends Model
 {
 	public $timestamps = false;
-
+	protected $hidden = ['product_id'];
 	protected $casts = [
-		'color_id' => 'int',
-		'collection_id' => 'int'
+		// 'color_id' => 'int',
+		// 'collection_id' => 'int'
 	];
 
 	protected $fillable = [
 		'source',
+		'product_id'
 	];
 
 

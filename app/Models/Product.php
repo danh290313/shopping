@@ -32,6 +32,8 @@ class Product extends Model
 {
 	use SoftDeletes;
 	protected $casts = [
+		'created_at' => 'datetime:Y-m-d H:m:s',
+		'updated_at' => 'datetime:Y-m-d H:m:s',
 	];
 	protected $hidden = ['pivot'];
 	protected $fillable = [
@@ -40,19 +42,27 @@ class Product extends Model
 		'description',
 		'slug'
 	];
-	public function product_details()
-	{
-		return $this->hasMany(ProductDetail::class);
-	}
+
 
 	public function tags()
 	{
 		return $this->belongsToMany(Tag::class,'product_tags','product_id','tag_id');
-					// ->withPivot('id');
 	}
-
+	public function details()
+	{
+		$data = $this->hasMany(ProductDetail::class);
+		return $data;
+	}
 	public function sizes()
 	{
 		return $this->hasMany(Size::class);
+	}
+	public function colors()
+	{
+		return $this->belongsToMany(Color::class,'product_details','product_id','color_id')
+		->withPivot(['picture_url','regular_price','quantity','active']);
+	}
+	public function pictures(){
+		return $this->hasMany(Picture::class);
 	}
 }
