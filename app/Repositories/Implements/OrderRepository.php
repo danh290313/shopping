@@ -4,11 +4,22 @@ use App\Repositories\Implements\BaseRepository;
 use App\Repositories\Interfaces\IOrderRepository;
 use App\Models\Order;
 class OrderRepository extends BaseRepository implements IOrderRepository{
-    protected $orderModel;
+    protected $orderModel, $userModel;
 
-    public function __construct($orderModel){
-        parent::__construct($orderModel);
+    public function __construct($orderModel, $userModel){
+        //parent::__construct($orderModel);
         $this->orderModel = $orderModel;
+        $this->userModel = $userModel;
+    }
+
+    public function getAllOrder(){
+        $orders = $this->orderModel->All();
+        foreach($orders as $index => $order)
+        {
+            $orders[$index]['user'] = $this->userModel->find($orders[$index]['user_id']);
+            unset($orders[$index]['user_id']);
+        }
+        return $orders;
     }
     public function updateById(array $data, $id){
         // $tag = $this->getById($id);

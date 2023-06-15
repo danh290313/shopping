@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use App\Repositories\Implements\BaseRepository;
 use App\Repositories\Implements\ProductRepository;
 use App\Repositories\Implements\TagRepository;
+use App\Repositories\Implements\UserRepository;
 use App\Repositories\Implements\OrderRepository;
 use App\Repositories\Implements\ColorRepository;
 use App\Repositories\Implements\SuccessCollectionResponse;
@@ -15,6 +16,7 @@ use App\Repositories\Interfaces\IBaseRepository;
 use App\Repositories\Interfaces\IProductRepository;
 use App\Repositories\Interfaces\ITagRepository;
 use App\Repositories\Interfaces\IOrderRepository;
+use App\Repositories\Interfaces\IUserRepository;
 use App\Repositories\Interfaces\IColorRepository;
 use App\Repositories\Interfaces\ISuccessCollectionResponse;
 use App\Repositories\Interfaces\ISuccessEntityResponse;
@@ -23,6 +25,7 @@ use App\Models\ProductDetail;
 use App\Models\Tag;
 use App\Models\Order;
 use App\Models\Color;
+use App\Models\User;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -38,8 +41,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ITagRepository::class, function () {
             return new TagRepository(new Tag());
         });
+        $this->app->singleton(IUserRepository::class, function () {
+            return new UserRepository(new User());
+        });
         $this->app->singleton(IOrderRepository::class, function () {
-            return new OrderRepository(new Order());
+            return new OrderRepository(new Order(), new User());
         });
         $this->app->singleton(IColorRepository::class, function () {
             return new ColorRepository(new Color());

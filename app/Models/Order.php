@@ -9,6 +9,7 @@ namespace App\Models;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Order extends Model
 {
+	use HasFactory;
 
 	protected $casts = [
 		// 'id' => 'int',

@@ -28,18 +28,18 @@ use Illuminate\Database\Eloquent\Model;
  */
 class User extends Model
 {
-	use HasFactory;
-	protected $table = 'user';
-	public $timestamps = false;
+	//use HasFactory;
+	
+	//public $timestamps = false;
 
 	protected $casts = [
-		'provider_id' => 'int'
+		//'provider_id' => 'int'
 	];
 
-	protected $hidden = [
-		'access_token',
-		'session_token'
-	];
+	// protected $hidden = [
+	// 	'access_token',
+	// 	'session_token'
+	// ];
 
 	protected $fillable = [
 		'name',

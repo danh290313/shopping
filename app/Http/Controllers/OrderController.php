@@ -10,6 +10,7 @@ use App\Http\Responses\SuccessEntityResponse;
 use App\Repositories\Interfaces\IOrderRepository;
 use App\Repositories\Interfaces\ISuccessCollectionResponse;
 use App\Repositories\Interfaces\ISuccessEntityResponse;
+use App\Repositories\Interfaces\IUserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -19,9 +20,10 @@ class OrderController extends Controller
     protected $successCollectionResponse;
     protected $successEntityResponse;
     
-    public function __construct(IOrderRepository $orderRepo,ISuccessCollectionResponse $successCollectionResponse,
+    public function __construct(IOrderRepository $orderRepo, IUserRepository $userRepo,ISuccessCollectionResponse $successCollectionResponse,
     ISuccessEntityResponse $successEntityResponse){
         $this->orderRepo = $orderRepo;
+        $this->userRepo = $userRepo;
         $this->successCollectionResponse = $successCollectionResponse;
         $this->successEntityResponse = $successEntityResponse;
     }
@@ -35,8 +37,10 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $rs = $this->orderRepo ->paginate(10)->toArray();
-        return $rs;
+       
+        $rs = $this->orderRepo->getAllOrder();
+        return $this->successCollectionResponse->createResponse($rs,200);
+
     }
 
     /**

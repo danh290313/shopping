@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\Interfaces\IUserRepository;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    protected $userRepo;
+    public function __construct(IUserRepository $userRepository) {
+        $this->userRepo = $userRepository;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -13,7 +18,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        $rs = $this->userRepo->paginate(10);
+        return $rs;
     }
 
     /**

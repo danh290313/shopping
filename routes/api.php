@@ -5,6 +5,7 @@ use App\Http\Controllers\SizeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ColorController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -39,7 +40,7 @@ Route::get('orders', [OrderController::class, 'index']);
 Route::post('orders', [OrderController::class, 'store']);
 Route::put('orders/{id}', [OrderController::class, 'update'])->whereNumber('id');
 
-
+Route::get('users', [UserController::class, 'index']);
 
 Route::get('tags', [TagController::class, 'index']);
 Route::post('tags', [TagController::class, 'store']);
