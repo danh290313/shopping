@@ -13,6 +13,7 @@ use App\Repositories\Interfaces\ISuccessEntityResponse;
 use App\Repositories\Interfaces\IUserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use PhpParser\Node\NullableType;
 
 class OrderController extends Controller
 {
@@ -20,10 +21,9 @@ class OrderController extends Controller
     protected $successCollectionResponse;
     protected $successEntityResponse;
     
-    public function __construct(IOrderRepository $orderRepo, IUserRepository $userRepo,ISuccessCollectionResponse $successCollectionResponse,
+    public function __construct(IOrderRepository $orderRepo,ISuccessCollectionResponse $successCollectionResponse,
     ISuccessEntityResponse $successEntityResponse){
         $this->orderRepo = $orderRepo;
-        $this->userRepo = $userRepo;
         $this->successCollectionResponse = $successCollectionResponse;
         $this->successEntityResponse = $successEntityResponse;
     }
@@ -53,10 +53,50 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'paid' => 'boolean|required',
-            'user_id' => 'int|exists:user,id',
+            'user_id' => 'int|exists:users,id',
+            'status' => ['required', 'string', 'in:canceled,pending,shipping,shipped'],
+            'shipped_at' => ['nullable'],
+            'created_at' => ['nullable'],
+            'updated_at' => ['nullable'],
+            'order_details' => [
+                'array',
+                'min:1'
+            ],
+            'order_details.*.product_detail_id' => [
+                'required',
+            ],
+            'order_details.*.quantity' => [
+                'required',
+                'numeric'
+            ],
+            'order_details.*.regular_price' => [
+                'required',
+            ],
+            'order_details.*.sale_price' => [
+                'required',
+            ],
+            'order_details.*.review_id' => ['nullable'],
+
         ]);
-        $order = $this->orderRepo->createOrder($request->all());
-        return $this->successEntityResponse->createResponse($product);
+        if (!array_key_exists('review_id', $validated)) {
+            $validated['review_id'] = null;
+        }
+        if (!array_key_exists('shipped_at', $validated)) {
+          
+            $validated['shipped_at'] = null;
+        }
+    
+        if (!array_key_exists('created_at', $validated)) {
+            
+            $validated['created_at'] = null;
+        }
+      
+        if (!array_key_exists('updated_at', $validated)) {
+         
+            $validated['updated_at'] = null;
+        }
+        $order = $this->orderRepo->createOrder($validated);
+        return $this->successEntityResponse->createResponse($order, 200);
     }
 
     /**
@@ -79,7 +119,53 @@ class OrderController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+      
+        $validated = $request->validate([
+            'paid' => 'boolean|required',
+            'user_id' => 'int|exists:users,id',
+            'status' => ['required', 'string', 'in:canceled,pending,shipping,shipped'],
+            'shipped_at' => ['nullable'],
+            'created_at' => ['nullable'],
+            'updated_at' => ['nullable'],
+            'order_details' => [
+                'array',
+                'min:1'
+            ],
+            'order_details.*.product_detail_id' => [
+                'required',
+            ],
+            'order_details.*.quantity' => [
+                'required',
+                'numeric'
+            ],
+            'order_details.*.regular_price' => [
+                'required',
+            ],
+            'order_details.*.sale_price' => [
+                'required',
+            ],
+            'order_details.*.review_id' => ['nullable'],
+
+        ]);
+        if (!array_key_exists('review_id', $validated)) {
+            $validated['review_id'] = null;
+        }
+        if (!array_key_exists('shipped_at', $validated)) {
+          
+            $validated['shipped_at'] = null;
+        }
+    
+        if (!array_key_exists('created_at', $validated)) {
+            
+            $validated['created_at'] = null;
+        }
+      
+        if (!array_key_exists('updated_at', $validated)) {
+         
+            $validated['updated_at'] = null;
+        }
+        $order = $this->orderRepo->updateOrder($validated, $id);
+        return $this->successEntityResponse->createResponse($order, 200);
     }
 
     /**

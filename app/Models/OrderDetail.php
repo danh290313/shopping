@@ -28,11 +28,11 @@ class OrderDetail extends Model
 {
 
 	protected $casts = [
-		'order_id' => 'int',
-		'product_detail_id' => 'int',
-		'regular_price' => 'float',
-		'quantity' => 'int',
-		'review_id' => 'int'
+		// 'order_id' => 'int',
+		// 'product_detail_id' => 'int',
+		// 'regular_price' => 'float',
+		// 'quantity' => 'int',
+		// 'review_id' => 'int'
 	];
 
 	protected $fillable = [

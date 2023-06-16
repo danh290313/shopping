@@ -7,6 +7,7 @@ interface IOrderRepository extends IBaseRepository{
 
   public function getAllOrder();
   public function createOrder($data);
+  public function updateOrder($data, $id);
   //  public function getAllOrder($data);
    // public function updateOrder($data,$id);
 }
