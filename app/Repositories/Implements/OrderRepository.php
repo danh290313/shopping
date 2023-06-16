@@ -10,7 +10,7 @@ class OrderRepository extends BaseRepository implements IOrderRepository{
     protected $orderModel, $userModel;
 
     public function __construct($orderModel, $userModel){
-        //parent::__construct($orderModel);
+        parent::__construct($orderModel);
         $this->orderModel = $orderModel;
         $this->userModel = $userModel;
     }

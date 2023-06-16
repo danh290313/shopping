@@ -35,7 +35,7 @@ class Product extends Model
 		'created_at' => 'datetime:Y-m-d H:m:s',
 		'updated_at' => 'datetime:Y-m-d H:m:s',
 	];
-	protected $hidden = ['pivot'];
+	protected $hidden = ['pivot','deleted_at'];
 	protected $fillable = [
 		'name',
 		'brand',

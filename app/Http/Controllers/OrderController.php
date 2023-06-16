@@ -13,7 +13,7 @@ use App\Repositories\Interfaces\ISuccessEntityResponse;
 use App\Repositories\Interfaces\IUserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use PhpParser\Node\NullableType;
+
 
 class OrderController extends Controller
 {
@@ -107,7 +107,11 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        //
+        $order = $this->orderRepo->getById($id);
+        if (!$order) {
+            throw new ModelNotFoundException("Order not found for id = ".$id.'.');
+        };
+        return $this->successEntityResponse->createResponse($order,200);
     }
 
     /**
@@ -176,6 +180,11 @@ class OrderController extends Controller
      */
     public function destroy($id)
     {
-        //
+        print $id;
+        $order = $this->orderRepo->find($id); 
+        $order->product_details()->detach();
+        $order->delete();
+
+        return response()->json(["result"=> "ok"]);
     }
 }

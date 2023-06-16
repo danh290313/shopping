@@ -82,9 +82,9 @@ class TagController extends Controller
         $validated = $request->validate([
             'name' => 'string|max:200',
             'collection_id' => 'int',
-            'product_id'=>'int|exists:products,id'
+            // 'product_id'=>'int|exists:products,id'
         ]);
-        $res = $this->tagRepository->updateById($request->only(['name','collection_id','product_id']),$id);
+        $res = $this->tagRepository->updateById($request->only(['name','collection_id']),$id);
         return $this->successEntityResponse->createResponse($res);
     }
 

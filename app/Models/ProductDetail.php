@@ -38,6 +38,8 @@ class ProductDetail extends Model
 		// 'quantity' => 'int'
 		'created_at' => 'datetime:Y-m-d H:m:s',
 		'updated_at' => 'datetime:Y-m-d H:m:s',
+		'regular_price' => 'float',
+		'active' => 'boolean'
 	];
 
 	protected $fillable = [
@@ -45,9 +47,13 @@ class ProductDetail extends Model
 		'color_id',
 		'picture_id',
 		'regular_price',
-		'quantity'
+		'quantity',
+		'active'
 	];
-
+	public function getRegularPriceAttribute($value)
+    {
+			return number_format($value,2,'.','');
+	}
 	public function product()
 	{
 		return $this->belongsTo(Product::class);
@@ -69,5 +75,8 @@ class ProductDetail extends Model
 	}
 	public function picture(){
 		return $this->belongsTo(Picture::class,'picture_id');
+	}
+	public function isCompositeKeyExist($productId, $colorId){
+		return $this->where(['product_id' => $productId, 'color_id' => $colorId])->exists();
 	}
 }

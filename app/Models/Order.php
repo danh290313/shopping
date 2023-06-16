@@ -34,7 +34,7 @@ class Order extends Model
 		'shipped_at' => 'datetime:Y-m-d H:m:s',
 		'created_at' => 'datetime:Y-m-d H:m:s',
 		'updated_at' => 'datetime:Y-m-d H:m:s',
-		
+		'paid' => 'boolean'
 	];
 
 	protected $fillable = [

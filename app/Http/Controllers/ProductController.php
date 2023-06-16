@@ -13,7 +13,7 @@ use App\Repositories\Interfaces\ISuccessCollectionResponse;
 use App\Repositories\Interfaces\ISuccessEntityResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use App\Exceptions\CustomException\UnprocessaleContents;
+use App\Http\Requests\UpdateProductRequest;
 class ProductController extends Controller
 {
     protected $productRepo;
@@ -37,8 +37,9 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $validated = $request->validate([
-            'includes' => 'array',
-            'includes.*'=>'in:tag,detail,all,picture'
+            'includes' => 'array|max:4',
+            'includes.*'=>'in:tag,detail,all,picture',
+            'limit' => 'int'
         ]);
         $rs = $this->productRepo->getAllProduct($request->all());
         return $this->successCollectionResponse->createResponse($rs,200);
@@ -58,15 +59,15 @@ class ProductController extends Controller
             'description'=>'required',
             'slug'=>'required|max:255|unique:products',
             'tags'=>'array|min:1',
-            'tags.*.id'=>'int|exists:tag,id',
-            'pictures' => 'required|min:1|array',      
-            'pictures.*' => 'image',     
-            'colors'=> 'required|array',
-            'colors.*.id' => 'int|required|exists:colors,id|distinct',            
-            'colors.*.picture' => 'int|required|distinct',
-            'colors.*.regular_price' => 'decimal:2|required',
-            'colors.*.quantity' => 'int|required',
-            'colors.*.active' => 'boolean|required',
+            'tags.*.id'=>'int|exists:tags,id',
+            // 'pictures' => 'min:1|array|required',      
+            // 'pictures.*' => 'image',     
+            // 'colors'=> 'required|array',
+            // 'colors.*.id' => 'int|required|exists:colors,id|distinct',            
+            // 'colors.*.picture' => 'int|required|distinct',
+            // 'colors.*.regular_price' => 'numeric|required|regex:/^\d+(\.\d{1,2})?$/',
+            // 'colors.*.quantity' => 'int|required',
+            // 'colors.*.active' => 'boolean|required',
         ]);
         $rs = $this->productRepo->createProduct($request->all());
         return  $this->successEntityResponse->createResponse($rs,200);
@@ -80,9 +81,12 @@ class ProductController extends Controller
      */
     public function show(Request $request,$id)
     {
-        $product = $this->productRepo->getById($id);
-        if(!$product) throw new ModelNotFoundException('Product not found for id='.$id.'.');
-        return $this->successEntityResponse->createResponse($product);
+        $validated = $request->validate([
+            'includes' => 'array|max:4',
+            'includes.*'=>'in:tag,detail,all,picture'
+        ]);
+        $rs = $this->productRepo->showProduct($request->all(),$id);
+        return $this->successEntityResponse->createResponse($rs);
     }
 
     /**
@@ -94,25 +98,14 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'string|max:200',
             'brand' => 'string|max:50',
             'description'=>'string',
-            'slug'=>'string|max:255|unique:products,slug,'.$id,
-            'tags'=>'array',
-            'tags.*.id'=>'int|exists:tags,id', 
-            'pictures' => 'array',      
-            'pictures.*' => 'int|exists:pictures,id', //picture_id , user call api add picture and pass id here when add new pictures
-            'colors'=> 'array',
-            'colors.*.id' => 'int|required|exists:colors,id|distinct',            
-            'colors.*.picture_id' => 'int|min:0|distinct',
-            'colors.*.regular_price' => 'decimal:2',
-            'colors.*.quantity' => 'int',
-            'colors.*.active' => 'boolean',
+            'slug'=>'string|max:255|unique:products,slug,'.$this->input('id'),
         ]);
         $product = $this->productRepo->updateProduct($request->all(),$id);
-        return $this->successEntityResponse->createResponse($product);
-      
+        return response()->json(["result"=> "ok"]);
     }
     /**
      * Remove the specified resource from storage.
@@ -131,5 +124,5 @@ class ProductController extends Controller
         $product = $this->productRepo->restoreAll();
         return response()->json(["result"=> "ok"]);
     }
-  
+   
 }

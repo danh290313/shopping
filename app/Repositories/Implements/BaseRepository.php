@@ -84,6 +84,9 @@ class BaseRepository implements IBaseRepository{
     {
         return $this->model->updateOrCreate($attributes, $value);
     }
+    public function where($val){
+        return $this->model->where($val);
+    }
 
     public function whereColumn($column_name, $value){
         return $this->model->where($column_name, $value)->first();
@@ -94,5 +97,8 @@ class BaseRepository implements IBaseRepository{
     }
     public function restoreAll(){
         return $this->model->withTrashed()->restore();
+    }
+    public function whereBelongsTo($value){
+        return $this->model->whereBelongsTo($value);
     }
 }
