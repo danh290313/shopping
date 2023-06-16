@@ -31,4 +31,7 @@ class Collection extends Model
 	{
 		return $this->hasMany(Tag::class);
 	}
+	public function picture(){
+		return $this->belongsTo(Picture::class);
+	}
 }

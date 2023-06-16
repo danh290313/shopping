@@ -3,20 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use  App\Repositories\Interfaces\IColorRepository;
+use App\Models\Collection;
+use App\Models\Picture;
+
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use App\Repositories\Interfaces\ISuccessCollectionResponse;
 use App\Repositories\Interfaces\ISuccessEntityResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-
-class ColorController extends Controller
+class CollectionController extends Controller
 {
-    protected $colorRepo;
     protected $successCollectionResponse;
     protected $successEntityResponse;
-    
-    public function __construct(IColorRepository $colorRepo,ISuccessCollectionResponse $successCollectionResponse,
+    public function __construct(ISuccessCollectionResponse $successCollectionResponse,
     ISuccessEntityResponse $successEntityResponse){
-        $this->colorRepo = $colorRepo;
         $this->successCollectionResponse = $successCollectionResponse;
         $this->successEntityResponse = $successEntityResponse;
     }
@@ -27,8 +26,13 @@ class ColorController extends Controller
      */
     public function index(Request $request)
     {
-        $rs = $this->colorRepo->paginate($request['limit'] ?? 10)->toArray();
-        return $rs;
+        $request->validate([
+            'limit' => 'int',
+            'page' => 'int'
+        ]);
+        $rs = Collection::with('picture')->paginate($request->limit ?? 10)->toArray();
+        // $rs = $rs->load('picture')->toArray();
+        return $this->successCollectionResponse->createResponse($rs);
     }
 
     /**
@@ -40,11 +44,14 @@ class ColorController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'=>'string|min:2|max:50|required|unique:colors,name',
-            'hex_value' => 'unique:colors,hex_value|required|regex:/^#[a-zA-Z0-9]{6}$/i',
+            'name' => 'string|required|max:50|unique:collections,name',
+            'picture' => 'image|required'
         ]);
-        $color = $this->colorRepo->create($request->all());
-        return $this->successEntityResponse->createResponse($color);    
+        $url =$request->picture->storeOnCloudinary('digitic')->getSecurePath();
+        $rs = Picture::create(['source'=>$url]);
+        $collection = Collection::create(['name'=>$request->name, 'picture_id'=>$rs->id]);
+        return $this->successEntityResponse->createResponse($collection);
+
     }
 
     /**
@@ -55,9 +62,6 @@ class ColorController extends Controller
      */
     public function show($id)
     {
-        $color = $this->colorRepo->getById($id);
-        if(!$color) throw new ModelNotFoundException('Color not found for id='.$id.'.');
-        return $this->successEntityResponse->createResponse($color);
     }
 
     /**
@@ -70,13 +74,14 @@ class ColorController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name'=>'min:2|max:50|required|unique:colors,name,'.$id,
-            'hex_value' => 'regex:/^#[a-zA-Z0-9]{6}$/i',
+            'picture_id' => 'exists:pictures,id',
+            'name' => 'unique:collections,name,'.$id
         ]);
-        $color = $this->colorRepo->getById($id);
-        if(!$color) throw new ModelNotFoundException('Color not found for id='.$id.'.');
-        $color->update($request->all());
-        return $this->successEntityResponse->createResponse($color);
+    
+        $collection = Collection::find($id);
+        if(!$collection) throw new ModelNotFoundException('Collection not found for id= '.$id.'.');
+        $collection->update($request->all());
+        return $this->successEntityResponse->createResponse($collection);
     }
 
     /**
@@ -87,9 +92,9 @@ class ColorController extends Controller
      */
     public function destroy($id)
     {
-        $color = $this->colorRepo->getById($id);
-        if(!$color) throw new ModelNotFoundException('Color not found for id='.$id.'.');
-        $color->delete();
-        return response()->json(['result'=>'ok']);
+        $collection = Collection::find($id);
+        if(!$collection) throw new ModelNotFoundException('Collection not found for id= '.$id.'.');
+        $collection->delete();
+        return response()->json(['result' => 'ok']);
     }
 }

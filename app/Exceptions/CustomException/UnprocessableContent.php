@@ -1,7 +1,7 @@
 <?php 
 namespace App\Exceptions\CustomException;
 use Exception;
-class UnprocessaleContent extends BaseException{
+class UnprocessableContent extends BaseException{
     private $title='unprocessable_content';
     private $statusCode = 422;
     public function __construct($message){

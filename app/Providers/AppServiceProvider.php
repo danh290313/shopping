@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Implements\BaseRepository;
 use App\Repositories\Implements\ProductRepository;
+use App\Repositories\Implements\ProductDetailRepository;
 use App\Repositories\Implements\TagRepository;
 use App\Repositories\Implements\OrderRepository;
 use App\Repositories\Implements\ColorRepository;
@@ -13,6 +14,7 @@ use App\Repositories\Implements\SuccessEntityResponse;
 
 use App\Repositories\Interfaces\IBaseRepository;
 use App\Repositories\Interfaces\IProductRepository;
+use App\Repositories\Interfaces\IProductDetailRepository;
 use App\Repositories\Interfaces\ITagRepository;
 use App\Repositories\Interfaces\IOrderRepository;
 use App\Repositories\Interfaces\IColorRepository;
@@ -35,6 +37,9 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(IProductRepository::class, function () {
             return new ProductRepository(new Product(),new ProductDetail(),new Picture());
+        });
+        $this->app->singleton(IProductDetailRepository::class, function () {
+            return new ProductDetailRepository(new Product(),new ProductDetail(),new Picture());
         });
         $this->app->singleton(ITagRepository::class, function () {
             return new TagRepository(new Tag());

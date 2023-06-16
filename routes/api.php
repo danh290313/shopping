@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\SizeController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductDetailController;
+use App\Http\Controllers\PictureController;
+use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ColorController;
 use Illuminate\Http\Request;
@@ -30,6 +33,12 @@ Route::delete('products/{id}', [ProductController::class, 'destroy'])->whereNumb
 Route::put('products/restore_all', [ProductController::class, 'restoreAll']);
 Route::post('products/add_tags', [ProductController::class, 'addTags']);
 
+Route::post('product_details', [ProductDetailController::class, 'store']);
+Route::get('product_details/{id}', [ProductDetailController::class, 'show'])->whereNumber('id');
+Route::put('product_details/{id}', [ProductDetailController::class, 'update'])->whereNumber('id');
+Route::delete('product_details/{id}', [ProductDetailController::class, 'destroy'])->whereNumber('id');
+
+
 // Route::apiResource('products', ProductController::class)->only([
 //     'show'
 // ])->where(['id'=>'numeric']);
@@ -50,5 +59,12 @@ Route::delete('colors/{id}', [ColorController::class, 'destroy'])->whereNumber('
 Route::get('sizes', [SizeController::class, 'index']);
 Route::post('sizes', [SizeController::class, 'store']);
 Route::get('sizes/{id}', [SizeController::class, 'show'])->whereNumber('id');
-Route::put('sizes/{id}', [SizeController::class, 'update'])->whereNumber('id');
 Route::delete('sizes/{id}', [SizeController::class, 'destroy'])->whereNumber('id');
+
+Route::post('pictures',[PictureController::class,'store']);
+Route::delete('pictures/{id}',[PictureController::class,'destroy'])->whereNumber('id');
+
+Route::get('collections', [CollectionController::class, 'index']);
+Route::post('collections', [CollectionController::class, 'store']);
+Route::put('collections/{id}', [CollectionController::class, 'update'])->whereNumber('id');
+Route::delete('collections/{id}', [CollectionController::class, 'destroy'])->whereNumber('id');
