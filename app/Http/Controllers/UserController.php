@@ -2,14 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\Interfaces\ISuccessCollectionResponse;
+use App\Repositories\Interfaces\ISuccessEntityResponse;
 use App\Repositories\Interfaces\IUserRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
     protected $userRepo;
-    public function __construct(IUserRepository $userRepository) {
+
+    protected $successCollectionResponse;
+
+    protected $successEntityResponse;
+
+    public function __construct(IUserRepository $userRepository, ISuccessCollectionResponse $successCollectionResponse, ISuccessEntityResponse $successEntityResponse) {
         $this->userRepo = $userRepository;
+        $this->successCollectionResponse = $successCollectionResponse;
+        $this->successEntityResponse = $successEntityResponse;
     }
     /**
      * Display a listing of the resource.
@@ -40,7 +50,16 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = $request->validate( [
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'provider' => 'required',
+            'provider_id' => 'required',
+            'access_token' => 'required',
+            'session_token' => 'required',
+        ]);
+        $rs = $this->userRepo->create($request->all());
+        return $this->successEntityResponse->createResponse($rs);
     }
 
     /**
@@ -51,7 +70,9 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        $user = $this->userRepo->getById($id);
+        if(!$user) throw new ModelNotFoundException('User not found for id='.$id.'.');
+        return $this->successEntityResponse->createResponse($user);
     }
 
     /**
@@ -74,7 +95,18 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $validator = $request->validate( [
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'provider' => 'required',
+            'provider_id' => 'required',
+            'access_token' => 'required',
+            'session_token' => 'required',
+        ]);
+        $user = $this->userRepo->getById($id);
+        if(!$user) throw new ModelNotFoundException('User not found for id='.$id.'.');
+        $user->update($request->all());
+        return $this->successEntityResponse->createResponse($user);
     }
 
     /**
@@ -85,6 +117,13 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = $this->userRepo->getById($id);
+        // if (!$user) {
+        //     return response()->json(['error' =>'User not found for id='.$id.'.'], 404);
+        // }
+        if(!$user) return throw new ModelNotFoundException('Color not found for id='.$id.'.');
+
+        $user->delete();
+        return response()->json(['result'=>'ok']);
     }
 }

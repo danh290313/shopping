@@ -51,7 +51,6 @@ Route::post('orders', [OrderController::class, 'store']);
 Route::put('orders/{id}', [OrderController::class, 'update'])->whereNumber('id');
 Route::delete('orders/{id}', [OrderController::class, 'destroy'])->whereNumber('id');
 
-Route::get('users', [UserController::class, 'index']);
 
 Route::get('tags', [TagController::class, 'index']);
 Route::post('tags', [TagController::class, 'store']);
@@ -78,3 +77,9 @@ Route::get('collections', [CollectionController::class, 'index']);
 Route::post('collections', [CollectionController::class, 'store']);
 Route::put('collections/{id}', [CollectionController::class, 'update'])->whereNumber('id');
 Route::delete('collections/{id}', [CollectionController::class, 'destroy'])->whereNumber('id');
+
+Route::get('users', [UserController::class, 'index']);
+Route::post('users', [UserController::class, 'store']);
+Route::put('users/{id}', [UserController::class, 'update'])->whereNumber('id');
+Route::get('users/{id}', [UserController::class, 'show'])->whereNumber('id');
+Route::delete('users/{id}', [UserController::class, 'destroy'])->whereNumber('id');
