@@ -30,7 +30,8 @@ class OrderDetail extends Model
 	protected $casts = [
 		'order_id' => 'int',
 		'product_detail_id' => 'int',
-		//'regular_price' => Money::class,
+		'regular_price' => 'float',
+		'sale_price' => 'float',
 		'quantity' => 'int',
 		'review_id' => 'int'
 	];
@@ -49,13 +50,13 @@ class OrderDetail extends Model
 		return $this->belongsTo(Order::class);
 	}
 
-	public function product_detail()
+	public function productDetail()
 	{
 		return $this->belongsTo(ProductDetail::class);
 	}
 
 	public function review()
 	{
-		return $this->belongsTo(Review::class);
+		return $this->hasOne(Review::class);
 	}
 }

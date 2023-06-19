@@ -3,7 +3,7 @@ namespace App\Exceptions\CustomException;
 use Exception;
 class BaseException extends Exception{
     private $title='unknow_exception';
-    private $statusCode = 400;
+    private $statusCode = 500;
     public function __construct($message,$title,$statusCode){
         parent::__construct($message);
         $this->title = $title;

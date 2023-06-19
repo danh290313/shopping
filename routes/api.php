@@ -6,12 +6,15 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\PictureController;
 use App\Http\Controllers\CollectionController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\SaleController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use Carbon\CarbonImmutable;
+date_default_timezone_set('Asia/Ho_Chi_Minh');
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -22,7 +25,6 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -40,16 +42,10 @@ Route::get('product_details/{id}', [ProductDetailController::class, 'show'])->wh
 Route::put('product_details/{id}', [ProductDetailController::class, 'update'])->whereNumber('id');
 Route::delete('product_details/{id}', [ProductDetailController::class, 'destroy'])->whereNumber('id');
 
-
-// Route::apiResource('products', ProductController::class)->only([
-//     'show'
-// ])->where(['id'=>'numeric']);
-
 Route::get('orders', [OrderController::class, 'index']);
 Route::get('orders/{id}', [OrderController::class, 'show'])->whereNumber('id');
 Route::post('orders', [OrderController::class, 'store']);
 Route::put('orders/{id}', [OrderController::class, 'update'])->whereNumber('id');
-Route::delete('orders/{id}', [OrderController::class, 'destroy'])->whereNumber('id');
 
 
 Route::get('tags', [TagController::class, 'index']);
@@ -83,3 +79,20 @@ Route::post('users', [UserController::class, 'store']);
 Route::put('users/{id}', [UserController::class, 'update'])->whereNumber('id');
 Route::get('users/{id}', [UserController::class, 'show'])->whereNumber('id');
 Route::delete('users/{id}', [UserController::class, 'destroy'])->whereNumber('id');
+
+Route::post('sales', [SaleController::class, 'store']);
+// Route::get('sales', [SaleController::class, 'show']);
+Route::put('sales/{id}', [SaleController::class, 'update'])->whereNumber('id');
+Route::delete('sales/{id}', [SaleController::class, 'destroy'])->whereNumber('id');
+
+
+Route::post('reviews', [ReviewController::class, 'store']);
+Route::put('reviews/{id}', [ReviewController::class, 'update'])->whereNumber('id');
+Route::get('reviews/{id}', [ReviewController::class, 'show'])->whereNumber('id');
+Route::delete('reviews/{id}', [ReviewController::class, 'destroy'])->whereNumber('id');
+Route::get('user_reviews/{id}', [ReviewController::class, 'getUserReviews'])->whereNumber('id');
+
+Route::get('time',fn()=> date('Y-m-d H:i:s', time()));
+Route::get('test',function (Request $request){
+    return CarbonImmutable::now()->setTimezone('Asia/Ho_Chi_Minh');
+});

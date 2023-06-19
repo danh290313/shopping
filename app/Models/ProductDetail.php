@@ -50,10 +50,10 @@ class ProductDetail extends Model
 		'quantity',
 		'active'
 	];
-	public function getRegularPriceAttribute($value)
-    {
-			return number_format($value,2,'.','');
-	}
+	// public function getRegularPriceAttribute($value)
+    // {
+	// 		return number_format($value,2,'.','');
+	// }
 	public function product()
 	{
 		return $this->belongsTo(Product::class);
@@ -64,11 +64,10 @@ class ProductDetail extends Model
 		return $this->belongsToMany(Color::class,'product_details','id','color_id');
 	}
 
-	public function order_details()
+	public function orderDetails()
 	{
 		return $this->hasMany(OrderDetail::class);
 	}
-
 	public function sales()
 	{
 		return $this->hasMany(Sale::class);

@@ -37,9 +37,21 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $validated = $request->validate([
-            'includes' => 'array|max:4',
-            'includes.*'=>'in:tag,detail,all,picture',
-            'limit' => 'int'
+            'includes' => 'array|max:5',
+            'includes.*'=>'in:tag,detail,all,picture,sale',
+            'limit' => 'int',
+            'page' => 'int',
+            'sort_by' => 'in:best_selling,title_ascending,title_descending,price_ascending,price_descending,created_ascending,created_descending',
+            'avalibylities' => 'array|max:2',
+            'avalibylities.*' => 'in:1,0',
+            'colors' => 'array',
+            'colors.*' => 'int|exists:colors,id' ,
+            'sizes' => 'array|max:5',
+            'sizes.*' => 'in:S,M,L,XL,XXL',
+            'tags' => 'array',
+            'tags.*' => 'required|string|exists:tags,name'
+
+
         ]);
         $rs = $this->productRepo->getAllProduct($request->all());
         return $this->successCollectionResponse->createResponse($rs,200);
@@ -82,8 +94,8 @@ class ProductController extends Controller
     public function show(Request $request,$id)
     {
         $validated = $request->validate([
-            'includes' => 'array|max:4',
-            'includes.*'=>'in:tag,detail,all,picture'
+            'includes' => 'array|max:5',
+            'includes.*'=>'in:tag,detail,all,picture,sale'
         ]);
         $rs = $this->productRepo->showProduct($request->all(),$id);
         return $this->successEntityResponse->createResponse($rs);
@@ -98,11 +110,14 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
+        echo $request->has('tags') ? 'co' : 'ko'; 
         $request->validate([
             'name' => 'string|max:200',
             'brand' => 'string|max:50',
             'description'=>'string',
-            'slug'=>'string|max:255|unique:products,slug,'.$this->input('id'),
+            'slug'=>'string|max:255|unique:products,slug,'.$request->input('id'),
+            'tags' => 'array',
+            'tags.*.id' => 'int|exists:tags,id'
         ]);
         $product = $this->productRepo->updateProduct($request->all(),$id);
         return response()->json(["result"=> "ok"]);

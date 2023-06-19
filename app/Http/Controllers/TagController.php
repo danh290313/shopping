@@ -80,8 +80,8 @@ class TagController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'name' => 'string|max:200',
-            'collection_id' => 'int',
+            'name' => 'string|max:200|unique:tags,name,'.$id,
+            'collection_id' => 'int|exists:collections,id',
             // 'product_id'=>'int|exists:products,id'
         ]);
         $res = $this->tagRepository->updateById($request->only(['name','collection_id']),$id);

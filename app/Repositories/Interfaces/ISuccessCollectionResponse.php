@@ -1,7 +1,7 @@
 <?php 
 namespace App\Repositories\Interfaces;
 interface ISuccessCollectionResponse{
-    public static function createResponse($data, $statusCode);
+    public static function createResponse(array $data, $statusCode);
 }
 
 ?>

@@ -9,7 +9,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\TimeZone;
 /**
  * Class Review
  * 
@@ -27,6 +27,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Review extends Model
 {
+	use TimeZone;
+	protected $hidden = ['order_detail_id'];
 
 	protected $casts = [
 		// 'user_id' => 'int',
@@ -37,7 +39,9 @@ class Review extends Model
 		'title',
 		'content',
 		'user_id',
-		'rating'
+		'rating',
+		'order_detail_id',
+		'parent_id'
 	];
 
 	public function user()
@@ -45,8 +49,11 @@ class Review extends Model
 		return $this->belongsTo(User::class);
 	}
 
-	public function order_detail()
+	public function orderDetail()
 	{
 		return $this->belongsTo(OrderDetail::class);
+	}
+	public function responses(){
+		return $this->hasMany(Review::class, 'parent_id','id');
 	}
 }

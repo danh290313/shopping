@@ -7,6 +7,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use App\Traits\TimeZone;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -30,10 +31,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Product extends Model
 {
-	use SoftDeletes;
+	use SoftDeletes, TimeZone;
 	protected $casts = [
-		'created_at' => 'datetime:Y-m-d H:m:s',
-		'updated_at' => 'datetime:Y-m-d H:m:s',
 	];
 	protected $hidden = ['pivot','deleted_at'];
 	protected $fillable = [
@@ -56,6 +55,10 @@ class Product extends Model
 	public function sizes()
 	{
 		return $this->hasMany(Size::class);
+	}
+	public function sales()
+	{
+		return $this->hasManyThrough(Sale::class,ProductDetail::class);
 	}
 	public function colors()
 	{

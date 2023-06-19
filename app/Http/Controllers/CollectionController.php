@@ -45,11 +45,11 @@ class CollectionController extends Controller
     {
         $request->validate([
             'name' => 'string|required|max:50|unique:collections,name',
-            'picture' => 'image|required'
+            'picture_id' => 'int|required|exists:pictures,id'
         ]);
-        $url =$request->picture->storeOnCloudinary('digitic')->getSecurePath();
-        $rs = Picture::create(['source'=>$url]);
-        $collection = Collection::create(['name'=>$request->name, 'picture_id'=>$rs->id]);
+        // $url =$request->picture->storeOnCloudinary('digitic')->getSecurePath();
+        // $rs = Picture::create(['source'=>$url]);
+        $collection = Collection::create(['name'=>$request->name, 'picture_id'=>$request->picture_id]);
         return $this->successEntityResponse->createResponse($collection);
 
     }

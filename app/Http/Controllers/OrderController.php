@@ -32,13 +32,18 @@ class OrderController extends Controller
 
     /**
      * Display a listing of the resource.
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-       
-        $rs = $this->orderRepo->getAllOrder();
+        $val = $request->validate([
+            'includes' => 'array|max:5',
+            'includes.*'=>'in:detail,review,all',
+            'limit' => 'int',
+            'page' => 'int'
+        ]);
+        $rs = $this->orderRepo->getAllOrder($val);
         return $this->successCollectionResponse->createResponse($rs,200);
 
     }
@@ -54,27 +59,28 @@ class OrderController extends Controller
         $validated = $request->validate([
             'paid' => 'boolean|required',
             'user_id' => 'int|exists:users,id',
-            'status' => ['required', 'string', 'in:canceled,pending,shipping,shipped'],
+            // 'status' => ['required', 'string', 'in:canceled,pendding,shipping,shipped'],
             'shipped_at' => ['nullable'],
             'created_at' => ['nullable'],
             'updated_at' => ['nullable'],
             'order_details' => [
                 'array',
+                'required',
                 'min:1'
             ],
             'order_details.*.product_detail_id' => [
-                'required',
+                'required','exists:product_details,id',
             ],
             'order_details.*.quantity' => [
                 'required',
                 'numeric'
             ],
-            'order_details.*.regular_price' => [
-                'required',
-            ],
-            'order_details.*.sale_price' => [
-                'required',
-            ],
+            'order_details.*.regular_price' => 
+                'numeric|required|regex:/^\d+(\.\d{1,2})?$/'
+            ,
+            'order_details.*.sale_price' => 
+                'numeric|regex:/^\d+(\.\d{1,2})?$/'
+            ,
             'order_details.*.review_id' => ['nullable'],
 
         ]);
@@ -125,51 +131,10 @@ class OrderController extends Controller
     {
       
         $validated = $request->validate([
-            'paid' => 'boolean|required',
-            'user_id' => 'int|exists:users,id',
-            'status' => ['required', 'string', 'in:canceled,pending,shipping,shipped'],
-            'shipped_at' => ['nullable'],
-            'created_at' => ['nullable'],
-            'updated_at' => ['nullable'],
-            'order_details' => [
-                'array',
-                'min:1'
-            ],
-            'order_details.*.product_detail_id' => [
-                'required',
-            ],
-            'order_details.*.quantity' => [
-                'required',
-                'numeric'
-            ],
-            'order_details.*.regular_price' => [
-                'required',
-            ],
-            'order_details.*.sale_price' => [
-                'required',
-            ],
-            'order_details.*.review_id' => ['nullable'],
-
+            'status' => ['required', 'string', 'in:canceled,pendding,shipping,shipped'],
         ]);
-        if (!array_key_exists('review_id', $validated)) {
-            $validated['review_id'] = null;
-        }
-        if (!array_key_exists('shipped_at', $validated)) {
-          
-            $validated['shipped_at'] = null;
-        }
-    
-        if (!array_key_exists('created_at', $validated)) {
-            
-            $validated['created_at'] = null;
-        }
-      
-        if (!array_key_exists('updated_at', $validated)) {
-         
-            $validated['updated_at'] = null;
-        }
-        $order = $this->orderRepo->updateOrder($validated, $id);
-        return $this->successEntityResponse->createResponse($order, 200);
+        $order = $this->orderRepo->updateOrder((array) $validated, $id);
+        return response()->json(["result"=> "ok"]);
     }
 
     /**
@@ -180,11 +145,5 @@ class OrderController extends Controller
      */
     public function destroy($id)
     {
-        print $id;
-        $order = $this->orderRepo->find($id); 
-        $order->product_details()->detach();
-        $order->delete();
-
-        return response()->json(["result"=> "ok"]);
     }
 }

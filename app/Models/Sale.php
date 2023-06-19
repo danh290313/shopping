@@ -8,7 +8,8 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-
+use Carbon\CarbonImmutable;
+use App\Traits\TimeZone;
 /**
  * Class Sale
  * 
@@ -24,25 +25,26 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Sale extends Model
 {
-	public $timestamps = false;
-
+	use TimeZone;
 	protected $casts = [
-		// 'id' => 'int',
-		// 'from' => 'datetime',
-		// 'to' => 'datetime',
-		// 'product_detail_id' => 'int',
-		// 'sale_price' => 'float'
+		'sale_price' => 'float',
+		// 'created_at' => 'datetime:Y-m-d H:m:s',
+		// 'updated_at' => 'datetime:Y-m-d H:m:s',
 	];
-
+	// protected $hidden = ['product_detail_id'];
 	protected $fillable = [
 		'from_time',
 		'to_time',
 		'product_detail_id',
-		'sale_price'
+		'sale_price',
+		'quantity'
 	];
-
-	public function product_detail()
-	{
-		return $this->belongsToMany(ProductDetail::class);
+	// public function productDetail()
+	// {
+	// 	return $this->belongsToMany(ProductDetail::class);
+	// }
+	public function scopeSaleValid($query,$salePrice, $productDetailId){
+		return $query->where('product_detail_id',$productDetailId)->where('from_time','<=',date('Y-m-d H:i:s', time()))
+		->where('to_time','>=',date('Y-m-d H:i:s', time()));
 	}
 }

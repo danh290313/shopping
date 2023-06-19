@@ -13,9 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('product_details', function (Blueprint $table) {
-            $table->tinyInteger('active');
+        Schema::table("order_details",function($table){
+            $table->dropForeign('order_details_review_id_foreign');
+            $table->dropColumn('review_id');
         });
+
     }
 
     /**
@@ -25,8 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        // Schema::table('product_details', function (Blueprint $table) {
-        //     $table->dropColumn('active');
-        // });
+        //
     }
 };

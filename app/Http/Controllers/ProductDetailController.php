@@ -74,8 +74,9 @@ class ProductDetailController extends Controller
      */
     public function show(Request $request,$id)
     {
-        $productDetail = $this->productDetailRepo->find($id);   
+        $productDetail = $this->productDetailRepo->find($id)->makeVisible('product_id');   
         if(!$productDetail) return throw new ModelNotFoundException('Product detail not found for id = '.$id.'.');
+        $productDetail = $productDetail->load('sales'); 
         // $productDetail->regular_price = number_format($productDetail->regular_price,2);
         return  $this->successEntityResponse->createResponse($productDetail,200);
     }
@@ -90,8 +91,8 @@ class ProductDetailController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'picture_id'=>'int|exists:pictures,id|required',
-            'regular_price'=> 'numeric|required|regex:/^\d+(\.\d{1,2})?$/',
+            'picture_id'=>'int|exists:pictures,id',
+            'regular_price'=> 'numeric|regex:/^\d+(\.\d{1,2})?$/',
             'quantity' => 'int|min:0',
             'active' => 'boolean'
         ]);

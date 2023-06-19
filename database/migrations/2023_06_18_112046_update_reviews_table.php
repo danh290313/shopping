@@ -13,8 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('product_details', function (Blueprint $table) {
-            $table->tinyInteger('active');
+        Schema::table('reviews',function($table){
+            $table->string('title',255)->nullable()->change();
+            $table->enum('rating',[1,2,3,4,5])->nullable()->change();;
         });
     }
 
@@ -25,8 +26,6 @@ return new class extends Migration
      */
     public function down()
     {
-        // Schema::table('product_details', function (Blueprint $table) {
-        //     $table->dropColumn('active');
-        // });
+        //
     }
 };

@@ -33,7 +33,7 @@ class Color extends Model
 		'name',
 		'hex_value'
 	];
-	public function product_details()
+	public function productDetails()
 	{
 		return $this->hasMany(ProductDetail::class);
 	}

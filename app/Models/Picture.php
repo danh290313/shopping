@@ -38,7 +38,7 @@ class Picture extends Model
 	];
 
 
-	public function product_detail()
+	public function productDetail()
 	{
 		return $this->belongsTo(ProductDetail::class);
 	}
