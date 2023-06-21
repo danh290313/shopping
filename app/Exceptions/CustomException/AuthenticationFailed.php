@@ -1,8 +1,8 @@
 <?php 
 namespace App\Exceptions\CustomException;
-class UnprocessableContent extends BaseException{
-    private $title='unprocessable_content';
-    private $statusCode = 422;
+class AuthenticationFailed extends BaseException{
+    private $title='authentication_failed';
+    private $statusCode = 401;
     public function __construct($message){
         parent::__construct($message, $this->title,$this->statusCode);
     }

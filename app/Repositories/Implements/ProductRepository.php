@@ -99,28 +99,6 @@ class ProductRepository extends BaseRepository implements IProductRepository{
                 });
             });
          }
-         echo $rs->toSql();
-        // ->when(array_key_exists('sizes',$data), function (Builder $query) use ($data){
-        //     $query->join('sizes','sizes.product_id','=','products.id');
-        //     $query->where(function (Builder $query) use ($data){
-        //         foreach($data['sizes'] as $size){
-        //             $query->orWhere('sizes.name', $size);
-        //         };
-        //     });
-        // })
-        // ->when(array_key_exists('tags',$data), function (Builder $query) use ($data){
-        //     $query->join('product_tags','product_tags.product_id','=','products.id')
-        //     ->join('tags','tags.id','=','product_tags.tag_id');
-        //     $query->where(function (Builder $query) use ($data){
-        //         foreach($data['tags'] as $tag){
-        //             $query->orWhere('tags.name', $tag);
-        //         };
-        //     });
-        // });
-        // ->paginate($data['limit'] ?? 10)->toArray();
-        // echo json_encode($rs);
-       
-
         if(array_key_exists('includes',$data)){
             $includes = [];
           foreach($data['includes'] as $include){
