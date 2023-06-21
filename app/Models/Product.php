@@ -68,4 +68,15 @@ class Product extends Model
 	public function pictures(){
 		return $this->hasMany(Picture::class);
 	}
+	public function orderDetails(){
+		return $this->hasManyThrough(OrderDetail::class,ProductDetail::class);
+	}
+	public function scopeOrderBySaleCount(){
+		return $this->orderByDesc(ProductDetail::selectRaw('sum(product_details.quantity)')
+        ->join('order_details','product_details.id','=','order_details.product_detail_id')
+        ->whereColumn('product_details.product_id','products.id')->groupBy('products.id'));
+	}
+	public function soldCount(){
+		return $this->orderDetails()->selectRaw('products.id,products.name, sum(quantity)')->groupBy('products.id,products.name');
+	}
 }

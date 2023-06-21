@@ -51,7 +51,6 @@ class OrderRepository extends BaseRepository implements IOrderRepository{
                 $productDetail = $this->productDetail->find($orderDetails['product_detail_id']) ;
                 if($productDetail['regular_price'] != $orderDetails['regular_price']) 
                     return throw new UnprocessableContent('Regular price isn\'t valid');
-
                 if(array_key_exists('sale_price',$orderDetails) && $orderDetails['sale_price'] != $orderDetails['regular_price']){
                     $saleValid = $this->saleModel->saleValid($orderDetails['sale_price'],$orderDetails['product_detail_id'])->first();
                     if(!$saleValid)  return throw new UnprocessableContent('Product sale is over');
@@ -59,9 +58,9 @@ class OrderRepository extends BaseRepository implements IOrderRepository{
                     return throw new UnprocessableContent('Sale price isn\'t valid');
                     if($saleValid['quantity'] < $orderDetails['quantity']) 
                         return throw new UnprocessableContent('Sale quantity isn\'t enought.');
+                    $saleValid['quantity']-=  $orderDetails['quantity'];
+                    $saleValid->update();
                 }
-                $saleValid['quantity']-=  $orderDetails['quantity'];
-                $saleValid->update();
                 $productDetail['quantity']-= $orderDetails['quantity'];
                 $productDetail->update();
                 // echo json_encode($saleValid);

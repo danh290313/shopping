@@ -14,6 +14,7 @@ use App\Repositories\Interfaces\ISuccessEntityResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Http\Requests\UpdateProductRequest;
+use App\Http\Resources\ProductCollection;
 class ProductController extends Controller
 {
     protected $productRepo;
@@ -45,7 +46,7 @@ class ProductController extends Controller
             'avalibylities' => 'array|max:2',
             'avalibylities.*' => 'in:1,0',
             'colors' => 'array',
-            'colors.*' => 'int|exists:colors,id' ,
+            'colors.*' => 'string|regex:/^#[a-zA-Z0-9]{6}$/i' ,
             'sizes' => 'array|max:5',
             'sizes.*' => 'in:S,M,L,XL,XXL',
             'tags' => 'array',
@@ -54,7 +55,7 @@ class ProductController extends Controller
 
         ]);
         $rs = $this->productRepo->getAllProduct($request->all());
-        return $this->successCollectionResponse->createResponse($rs,200);
+        return $this->successCollectionResponse->createResponse($rs);
     }
 
     /**

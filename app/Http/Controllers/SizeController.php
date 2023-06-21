@@ -30,13 +30,13 @@ class SizeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|unique:sizes,name',
+            'name' => 'required|string',
             'product_id' => 'required|int|exists:products,id',
         ]);
-        $size = Size::create([
+        $size = Size::updateOrCreate([
             'name' => $request->input('name'),
             'product_id' => $request->input('product_id')
-        ]);
+        ],[]);
 
         return  $this->successEntityResponse->createResponse($size);
     }

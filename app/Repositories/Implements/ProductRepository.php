@@ -8,8 +8,13 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use App\Exceptions\CustomException\UnprocessableContent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
-use App\Model\Sale;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\Sale;
+use App\Models\OrderDetail;
+use App\Models\ProductDetail;
+use App\Models\Color;
+use App\Http\Resources\ProductResource;
+// use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder;
 class ProductRepository extends BaseRepository implements IProductRepository{
     protected $modelProduct;
     protected $modelProdctDetail;
@@ -22,69 +27,100 @@ class ProductRepository extends BaseRepository implements IProductRepository{
     }
     public function getAllProduct($data){
         $rs = $this->modelProduct;
-        $rs = $rs->select('products.id','products.name','regular_price','active')->join('product_details','product_details.product_id','=','products.id')
-        ->when(array_key_exists('avalibylities',$data), function (Builder $query, string $role) use ($data){
-            $query->where(function (Builder $query) use ($data){
-                foreach($data['avalibylities'] as $avai){
-                    $query->orWhere('product_details.active', $avai);
-                }
-            });
-        })
-        ->when(array_key_exists('sort_by',$data), function (Builder $query, string $role) use ($data){
+        if(array_key_exists('sort_by',$data)) {
             switch($data['sort_by']){
                 case 'best_selling':
-                    $query->selectRaw('min(product_details.regular_price) as price, sum(order_details.quantity) as sold')
-                    ->leftJoin('order_details','order_details.product_detail_id','=','product_details.id')
-                    ->groupByRaw('products.id,products.name')->orderByRaw('sold desc');
+                    $rs = $rs->orderByDesc(ProductDetail::selectRaw('sum(product_details.quantity)')
+                    ->join('order_details','product_details.id','=','order_details.product_detail_id')
+                    ->whereColumn('product_details.product_id','products.id')->groupBy('products.id'));
                     break;
                 case 'title_ascending':
-                    $query->orderBy('products.name')->distinct();
+                    $rs = $rs->orderBy('products.name');
                     break;
                 case 'title_descending':
-                    $query->orderByDesc('products.name')->distinct();
+                    $rs = $rs->orderByDesc('products.name');
                     break;
                 case 'price_ascending':
-                    $query->orderBy('product_details.regular_price')->distinct();
+                    $rs = $rs->orderBy(ProductDetail::select('regular_price')
+                    ->whereColumn('products.id','product_details.product_id')->limit(1));
                     break;
                 case 'price_descending':
-                    $query->orderByDesc('product_details.regular_price');
+                    $rs = $rs->orderByDesc(ProductDetail::select('regular_price')
+                    ->whereColumn('products.id','product_details.product_id')->limit(1));
                     break;
                 case 'created_ascending':
-                    $query->orderBy('products.created_at');
+                    $rs = $rs->orderBy('products.created_at');
                     break;
                 case 'created_descending':
-                    $query->orderByDesc('products.created_at');
+                    $rs = $rs->orderByDesc('products.created_at');
                     break;
             }
-        } )
-        ->when(array_key_exists('colors',$data), function (Builder $query) use ($data){
-            $query->join('colors','colors.id','=','product_details.color_id');
-            $query->where(function (Builder $query) use ($data){
-                foreach($data['colors'] as $color){
-                    $query->orWhere('product_details.color_id', $color);
-                };
+        };
+        if(array_key_exists('avalibylities',$data)){
+            $rs = $rs->whereExists(function($query) use($data){
+                        $query->select('products.id')->from('product_details')
+                        ->whereColumn('products.id','product_details.product_id')
+                        ->where(function($query) use ($data) {
+                            foreach($data['avalibylities'] as $avai){
+                                $query->orWhere('product_details.active',$avai);
+                            };
+                        });
             });
-        })
-        ->when(array_key_exists('sizes',$data), function (Builder $query) use ($data){
-            $query->join('sizes','sizes.product_id','=','products.id');
-            $query->where(function (Builder $query) use ($data){
-                foreach($data['sizes'] as $size){
-                    $query->orWhere('sizes.name', $size);
-                };
+        }
+        if(array_key_exists('colors',$data)){
+           $rs = $rs->whereExists(function($query) use($data){
+                $query->from('product_details')->join('colors','product_details.color_id','colors.id')
+                ->whereColumn('products.id','product_details.product_id')
+                ->where(function($query) use ($data) {
+                    foreach($data['colors'] as $color){
+                        $query->orWhere('colors.hex_value',$color);
+                    }
+                });
+           });
+        }
+        if(array_key_exists('sizes',$data)){
+            $rs = $rs->whereExists(function($query) use($data){
+                $query->from('sizes')->whereColumn('sizes.product_id','products.id')
+                ->where(function($query) use ($data) {
+                    foreach($data['sizes'] as $size){
+                        $query->orWhere('sizes.name',$size);
+                    };
+                });
             });
-        })
-        ->when(array_key_exists('tags',$data), function (Builder $query) use ($data){
-            $query->join('tags','tags.product_id','=','products.id');
-            $query->where(function (Builder $query) use ($data){
-                foreach($data['tags'] as $tag){
-                    // $query->orWhere('sizes.name', $size);
-                    // $query->whereExists()
-                };
+         }
+         if(array_key_exists('tags',$data)){
+            $rs = $rs->whereExists(function($query) use($data){
+                $query->from('product_tags')->whereColumn('product_tags.product_id','products.id')
+                ->join('tags','tags.id','=','product_tags.tag_id')
+                ->where(function($query) use ($data) {
+                    foreach($data['tags'] as $tags){
+                        $query->orWhere('tags.name',$tags);
+                    };
+                });
             });
-        })
-        ->get();
-        echo json_encode($rs); 
-        return $rs;
+         }
+         echo $rs->toSql();
+        // ->when(array_key_exists('sizes',$data), function (Builder $query) use ($data){
+        //     $query->join('sizes','sizes.product_id','=','products.id');
+        //     $query->where(function (Builder $query) use ($data){
+        //         foreach($data['sizes'] as $size){
+        //             $query->orWhere('sizes.name', $size);
+        //         };
+        //     });
+        // })
+        // ->when(array_key_exists('tags',$data), function (Builder $query) use ($data){
+        //     $query->join('product_tags','product_tags.product_id','=','products.id')
+        //     ->join('tags','tags.id','=','product_tags.tag_id');
+        //     $query->where(function (Builder $query) use ($data){
+        //         foreach($data['tags'] as $tag){
+        //             $query->orWhere('tags.name', $tag);
+        //         };
+        //     });
+        // });
+        // ->paginate($data['limit'] ?? 10)->toArray();
+        // echo json_encode($rs);
+       
+
         if(array_key_exists('includes',$data)){
             $includes = [];
           foreach($data['includes'] as $include){
@@ -106,12 +142,11 @@ class ProductRepository extends BaseRepository implements IProductRepository{
                     break;
             }
           }
-            $rs = $this->modelProduct->with($includes)->paginate($data['limit'] ?? 10)->withQueryString()->toArray();
+            $rs = $rs->with($includes)->paginate($data['limit'] ?? 10)->withQueryString()->toArray();
         }else{
-            $rs = $this->modelProduct->paginate($data['limit'] ?? 10)->withQueryString()->toArray();
+            $rs = $rs->paginate($data['limit'] ?? 10)->withQueryString()->toArray();
         }
     
-        // $rs = $this->modelProdctDetail->with('color')->paginate($data['limit'] ?? 10)->toArray();
         return $rs;
     }
     public function createProduct($data){
@@ -156,7 +191,6 @@ class ProductRepository extends BaseRepository implements IProductRepository{
         $product =  DB::transaction(function () use ($data,$product) {
             // $credentials = $data->only(['name','brand','description','slug']);
             $product->update($data);
-            echo json_encode($data);
             if(array_key_exists('tags',$data)){
                 $product->tags()->detach();
                 foreach($data['tags'] as $tag){
@@ -196,7 +230,5 @@ class ProductRepository extends BaseRepository implements IProductRepository{
         // $product = $this->productRepo->getById($id);
         return $rs;
     }
-    public function bestSale($builder){
-        return $builder->join('product_details','product_details.product_id','=','products.id').groupBy('products.id');
-    }
+  
 }
