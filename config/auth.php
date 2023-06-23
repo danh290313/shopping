@@ -40,6 +40,15 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        
+        'users' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
+        'admins' => [
+            'driver' => 'sanctum',
+            'provider' => 'admins',
+        ],
     ],
 
     /*
@@ -60,9 +69,13 @@ return [
     */
 
     'providers' => [
-        'users' => [
+        'admins' => [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
+        ],
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\User::class,
         ],
     ],
 

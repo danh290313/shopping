@@ -1,5 +1,5 @@
 <?php
-
+use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SizeController;
 use App\Http\Controllers\ProductController;
@@ -11,6 +11,7 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\AuthAdminController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -26,22 +27,12 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 Route::get('products', [ProductController::class, 'index']);
-
-
-Route::post('product_details', [ProductDetailController::class, 'store']);
+Route::get('products/{id}', [ProductController::class, 'show'])->whereNumber('id');
 Route::get('product_details/{id}', [ProductDetailController::class, 'show'])->whereNumber('id');
-Route::put('product_details/{id}', [ProductDetailController::class, 'update'])->whereNumber('id');
-Route::delete('product_details/{id}', [ProductDetailController::class, 'destroy'])->whereNumber('id');
 
 Route::get('orders', [OrderController::class, 'index']);
 Route::get('orders/{id}', [OrderController::class, 'show'])->whereNumber('id');
-Route::post('orders', [OrderController::class, 'store']);
-Route::put('orders/{id}', [OrderController::class, 'update'])->whereNumber('id');
-
 Route::get('tags', [TagController::class, 'index']);
 
 Route::get('colors', [ColorController::class, 'index']);
@@ -51,32 +42,44 @@ Route::get('sizes', [SizeController::class, 'index']);
 Route::get('collections', [CollectionController::class, 'index']);
 
 Route::get('users', [UserController::class, 'index']);
-Route::post('users', [UserController::class, 'store']);
-Route::put('users/{id}', [UserController::class, 'update'])->whereNumber('id');
-Route::get('users/{id}', [UserController::class, 'show'])->whereNumber('id');
-Route::delete('users/{id}', [UserController::class, 'destroy'])->whereNumber('id');
+// Google Sign In
+Route::post('/auth/google/url', [GoogleController::class, 'googleLoginUrl']);
+Route::get('/auth/callback/google', [GoogleController::class, 'loginCallback']);
 
-Route::post('reviews', [ReviewController::class, 'store']);
-Route::delete('reviews/{id}', [ReviewController::class, 'destroy'])->whereNumber('id');
-Route::get('user_reviews/{user_id}', [ReviewController::class, 'getUserReviews'])->whereNumber('user_id');
+Route::middleware('auth:users')->group(function (){
+    Route::post('/auth/logout', [GoogleController::class, 'googleLoginUrl']);
 
-Route::get('time',fn()=> date('Y-m-d H:i:s', time()));
-Route::get('test',function (Request $request){
-    return CarbonImmutable::now()->setTimezone('Asia/Ho_Chi_Minh');
+    Route::post('orders', [OrderController::class, 'store']);
+    Route::put('orders/{id}', [OrderController::class, 'update'])->whereNumber('id');
+    
+    Route::post('users', [UserController::class, 'store']);
+    Route::put('users/{id}', [UserController::class, 'update'])->whereNumber('id');
+    Route::get('users/{id}', [UserController::class, 'show'])->whereNumber('id');
+    Route::delete('users/{id}', [UserController::class, 'destroy'])->whereNumber('id');
+
+    
+    Route::post('reviews', [ReviewController::class, 'store']);
+    Route::delete('reviews/{id}', [ReviewController::class, 'destroy'])->whereNumber('id');
+    Route::get('user_reviews/{user_id}', [ReviewController::class, 'getUserReviews'])->whereNumber('user_id');
 });
 
 Route::prefix('/admin')->group(function(){
     Route::post('/register',[AuthAdminController::class,'register']);
     Route::post('/login',[AuthAdminController::class,'login']);
-    Route::middleware('auth:sanctum')->group(function (){
+    Route::middleware('auth:admins')->group(function (){
+        Route::get('/test',function(){return "logged in.";});
         Route::post('/logout',[AuthAdminController::class,'logout']);
 
         Route::post('products', [ProductController::class, 'store']);
         Route::put('products/{id}', [ProductController::class, 'update'])->whereNumber('id');
-        Route::get('products/{id}', [ProductController::class, 'show'])->whereNumber('id');
+        
         Route::delete('products/{id}', [ProductController::class, 'destroy'])->whereNumber('id');
         Route::put('products/restore_all', [ProductController::class, 'restoreAll']);
         Route::post('products/add_tags', [ProductController::class, 'addTags']);
+
+        Route::post('product_details', [ProductDetailController::class, 'store']);
+        Route::put('product_details/{id}', [ProductDetailController::class, 'update'])->whereNumber('id');
+        Route::delete('product_details/{id}', [ProductDetailController::class, 'destroy'])->whereNumber('id');
 
         Route::post('tags', [TagController::class, 'store']);
         Route::put('tags/{id}', [TagController::class, 'update'])->whereNumber('id');
@@ -88,11 +91,9 @@ Route::prefix('/admin')->group(function(){
         Route::get('colors/{id}', [ColorController::class, 'show'])->whereNumber('id');
         Route::delete('colors/{id}', [ColorController::class, 'destroy'])->whereNumber('id');
 
-
         Route::post('sizes', [SizeController::class, 'store']);
         Route::get('sizes/{id}', [SizeController::class, 'show'])->whereNumber('id');
         Route::delete('sizes/{id}', [SizeController::class, 'destroy'])->whereNumber('id');
-        
         
         Route::post('pictures',[PictureController::class,'store']);
         Route::delete('pictures/{id}',[PictureController::class,'destroy'])->whereNumber('id');
@@ -100,7 +101,6 @@ Route::prefix('/admin')->group(function(){
         Route::post('collections', [CollectionController::class, 'store']);
         Route::put('collections/{id}', [CollectionController::class, 'update'])->whereNumber('id');
         Route::delete('collections/{id}', [CollectionController::class, 'destroy'])->whereNumber('id');
-        
         
         Route::post('sales', [SaleController::class, 'store']);
         // Route::get('sales', [SaleController::class, 'show']);
@@ -111,3 +111,7 @@ Route::prefix('/admin')->group(function(){
     });
 
 });
+
+
+
+

@@ -10,7 +10,10 @@ use App\Models\Order;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Notifications\Notifiable;
+use App\Traits\TimeZone;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 /**
  * Class User
  * 
@@ -26,28 +29,26 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class User extends Model
+class User extends Authenticatable
 {
-	use HasFactory;
-	
-	public $timestamps = false;
-
+	use HasApiTokens, HasFactory, Notifiable, TimeZone;
 	protected $casts = [
 		//'provider_id' => 'int'
 	];
 
-	// protected $hidden = [
-	// 	'access_token',
-	// 	'session_token'
-	// ];
+	protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
 	protected $fillable = [
 		'name',
-		'email',
-		'provider',
-		'provider_id',
-		'access_token',
-		'session_token'
+        'email',
+        'password',
+		'social_id',
+		'social_provider',
+		'avatar',
+		
 	];
 
 	public function reviews()

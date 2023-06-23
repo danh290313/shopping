@@ -25,9 +25,7 @@ class AuthAdminController extends Controller
        $this->successCollectionResponse = $successCollectionResponse;
        $this->successEntityResponse = $successEntityResponse;
    }
-
     public function register(Request $request){
-
         $data = $request->validate([
             'name'=> 'string|max:255|required',
             'email'=> 'email|required|unique:admins,email',
@@ -52,21 +50,22 @@ class AuthAdminController extends Controller
         ]);
         $remember = $credentials['remember'] ?? false;
         unset($credentials['remember']);
-        if(!Auth::attempt($credentials, $remember)){
-            return throw new AuthenticationFailed("Invalid email or password.");
-        }
-        $admin = Auth::user();
+        // if(!Auth::guard('admins')->attempt($credentials, $remember)){ 
+        //     return throw new AuthenticationFailed("Invalid email or password.");
+        // }
+        // $admin = 
+        $admin = Admin::where(['email'=> $credentials['email']])-> first()->makeVisible('password');
+        if(!$admin || !password_verify( $credentials['password'],$admin->password))  return throw new AuthenticationFailed("Invalid email or password.");
         // $user_info =  Admin::where('id',$admin['id'])->first();
         $token = $admin->createToken('admin')->plainTextToken;
         return $this->successEntityResponse->createResponse([
             'token' => $token,
-            'info' => $admin,
+            'info' => $admin->makeHidden('password'),
         ]);    
     }
 
-    public function logout(){
-        $admin = Auth::user();
-        $admin->currentAccessToken()->delete();
+    public function logout(Request $request){
+        $request->user()->currentAccessToken()->delete();
         return response()->json(['result' => 'ok']);
     }
 }
